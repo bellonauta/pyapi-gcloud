@@ -1,0 +1,14 @@
+out
+log.log
+**/.vscode/.ropeproject/**
+.vscode
+__pycache__
+aws
+**/.vscode-test/**
+**/.vscode test/**
+**/.vscode-smoke/**
+**/.venv*/
+.pytest_cache
+tmp/**
+.python-version
+.vs/
