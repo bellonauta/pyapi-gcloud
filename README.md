@@ -1,2 +1,1 @@
-# pyapi
-API REST de Pedidos em Python
+# PyApi - API REST de Pedidos em Python
