@@ -176,7 +176,7 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
 
     - Solicitação(Query parameters) tipo 1 - Consultar os detalhes de um produto em específico:
       <pre>
-        ?id=157
+        ?id=359
       </pre>      
 
         - Retorno:
@@ -207,7 +207,7 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
 
     - Solicitação(Query parameters) tipo 2 - Listagem de todos os produtos cadastrados. A listagem é paginada e ordenada conforme o informado nos parâmetros:
       <pre>
-        ?id=359&page=2&order=name or id
+        ?page=2&order=name or id
       </pre>      
 
         - Retorno:

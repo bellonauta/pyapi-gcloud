@@ -90,7 +90,7 @@ _GET_PRODUCT_JSON_SCHEMA = {
             "page": {"type":"string", "pattern": "^[0-9]+$"},
             "order": {"type":"string", "enum": ["id","name"]}
        },
-       "required": ["page"]         
+       "required": []         
 }   
 
 #--------------------------------------------------------------------------------
@@ -103,5 +103,5 @@ _GET_MANUFACTURER_JSON_SCHEMA = {
             "page": {"type":"string", "pattern": "^[0-9]+$"},
             "order": {"type":"string", "enum": ["id","name"]}
        },
-       "required": ["page"]         
+       "required": []         
 }   

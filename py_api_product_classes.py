@@ -202,12 +202,12 @@ class GetProduct(cls.GetMasterRecord):
           if 'id' not in request.keys():
                request['id'] = 0 # Listagem. Se houver ID informado retornará detalhes de um produto.             
           else: 
-               request['id'] = int(request['id'])  # Conversão   
+               request['id'] = max(0, int(request['id']))  # Conversão   
           #
           if 'page' not in request.keys():
                request['page'] = 1
           else: 
-               request['page'] = int(request['page'])  # Conversão     
+               request['page'] = max(1, int(request['page']))  # Conversão     
           # Order...     
           if 'order' not in request.keys():
                request['order'] = 'id' # Ordem padrão de classificação da consulta.       
