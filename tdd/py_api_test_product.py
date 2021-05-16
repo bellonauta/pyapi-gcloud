@@ -8,7 +8,7 @@
 #    coloque esse script dentro dela;
 # b) Por fim, estando dentro da pasta do projet, oexecute
 #    no terminal/prompt:
-#       python -m unittest tdd/test_product_api.py
+#       python -m unittest tdd/py_api_test_product.py
 #--------------------------------------------------------------------
 
 from typing import AbstractSet, Union
@@ -190,7 +190,8 @@ class ProductAPITests(unittest.TestCase):
         self.assertEqual('rows' in get['body'].keys(), True, 'O atributo "rows" não foi retornado.')
         self.assertLessEqual(len(get['body']['rows']), get['body']['maxRowsPerPage'], 'Mais registros que o permitido sendo retornados')
         
-        print(get)
-            
-   
 # ----------------------------------------------------------------------------------------------------------------------            
+
+# DEBUG...
+#test = ProductAPITests()
+#test.test_insert_product_with_new_manufacturer()

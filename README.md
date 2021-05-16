@@ -1,16 +1,16 @@
-# PyApi - API REST de Pedidos em Python
+# PyApi - API REST de Pedidos de Compra em Python
 
-É uma aplicação exclusivamente de nível backend, de nível intermediário, que
+É uma aplicação exclusivamente de nível backend, intermediário, que
 se propõe apresentar uma implementação de API REST em Python.
 
 Está baseada no atendimento ao processo de pedidos de compras.
-Permitirá, em seu último release:
+Permitirá em seu último release:
 - CRUD de produtos;
 - CRUD de fabricantes;
 - CRUD de pedidos;
 - CRUD de clientes.
 
-Nesse primeiro release estão implementados os CRUDs para produtos e fabricantes.
+Nesse primeiro release, estão implementados somente os CRUDs para produtos e fabricantes.
 
 ---
 ## Dependências
@@ -20,13 +20,14 @@ Nesse primeiro release estão implementados os CRUDs para produtos e fabricantes
     - jsonschema (validate)
     - psycopg2 (extras)
     - abc (abstractmethod)
+    - unittest
 
 - Cloud
     - AWS - API Gateway, Lambda e RDS(PostgreSQL)
 
 ---
-## CRUDs de produtos (fabricantes em associação)
-- API: https://3khfi4cf71.execute-api.sa-east-1.amazonaws.com/prod
+## CRUDs de produtos e fabricantes
+- API: https://3khfi4cf71.execute-api.sa-east-1.amazonaws.com/prod/product
 
 - **PUT** - Inclusão de produtos
     - Solicitação tipo 1 - Com associação de fabricante já cadastrado ao produto:
@@ -37,8 +38,8 @@ Nesse primeiro release estão implementados os CRUDs para produtos e fabricantes
          "barcode": "7002085002679",
          "manufacturer": {
              "id": 2
-        },
-        "unitPrice": 25.89
+         },
+         "unitPrice": 25.89
       }
       </pre>
 
@@ -60,12 +61,12 @@ Nesse primeiro release estão implementados os CRUDs para produtos e fabricantes
           <pre>   
           {  "statusCode": 200,
              "body": { 
-                 "id": 157
+                 "id": 359,
                  "name": "Grape juice",
                  "description": "Natural grape juice",
                  "barcode": "7002085002679",
                  "manufacturer": {
-                     "id": 2
+                     "id": 2,
                      "name": "Quality farm goods"
                  },    
                  "unitPrice": 25.89
@@ -85,14 +86,14 @@ Nesse primeiro release estão implementados os CRUDs para produtos e fabricantes
     - Solicitação tipo 1 - Com troca de fabricante(já cadastrado) do produto:
       <pre>
       {    
-         "id": 157 
+         "id": 359, 
          "name": "Orange juice",
          "description": "Natural orange juice",
          "barcode": "7002085001213",
          "manufacturer": {
              "id": 3
-        },
-        "unitPrice": 20.89
+         },
+         "unitPrice": 20.89
       }
       </pre>
 
@@ -114,12 +115,12 @@ Nesse primeiro release estão implementados os CRUDs para produtos e fabricantes
           <pre>   
           {  "statusCode": 200,
              "body": { 
-                 "id": 157
+                 "id": 359,
                  "name": "Orange juice",
                  "description": "Natural Orange juice",
                  "barcode": "7002085001213",
                  "manufacturer": {
-                     "id": 3
+                     "id": 3,
                      "name": "New orange manufacturer & Co."
                  },    
                  "unitPrice": 20.89
@@ -128,7 +129,7 @@ Nesse primeiro release estão implementados os CRUDs para produtos e fabricantes
           </pre>
         - Falha:
           <pre>
-          {  "statusCode":  HTTP status code(!= 200)
+          {  "statusCode": 404 Quando chave inexistente
              "body: {
                  "message": "Descrição da falha/erro."
              }
@@ -141,7 +142,7 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
     - Solicitação tipo 1 - Com troca de fabricante(já cadastrado) do produto:
       <pre>
       {    
-         "id": 157 
+         "id": 359 
       }
       </pre>
 
@@ -150,12 +151,12 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
           <pre>   
           {  "statusCode": 200,
              "body": { 
-                 "id": 157
+                 "id": 359,
                  "name": "Orange juice",
                  "description": "Natural Orange juice",
                  "barcode": "7002085001213",
                  "manufacturer": {
-                     "id": 3
+                     "id": 3,
                      "name": "New orange manufacturer & Co."
                  },    
                  "unitPrice": 20.89
@@ -164,7 +165,7 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
           </pre>
         - Falha:
           <pre>
-          {  "statusCode":  HTTP status code(!= 200)
+          {  "statusCode":  404 Quando chave inexistente
              "body: {
                  "message": "Descrição da falha/erro."
              }
@@ -183,12 +184,12 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
                <pre>   
                {  "statusCode": 200,
                   "body": { 
-                      "id": 157
+                      "id": 359,
                       "name": "Orange juice",
                       "description": "Natural Orange juice",
                       "barcode": "7002085001213",
                       "manufacturer": {
-                          "id": 3
+                          "id": 3,
                           "name": "New orange manufacturer & Co."
                       },    
                       "unitPrice": 20.89
@@ -206,24 +207,27 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
 
     - Solicitação(Query parameters) tipo 2 - Listagem de todos os produtos cadastrados. A listagem é paginada e ordenada conforme o informado nos parâmetros:
       <pre>
-        ?id=157&page=2&order=name or id
+        ?id=359&page=2&order=name or id
       </pre>      
 
         - Retorno:
-             - Sucesso - Com produtos na página:
+             - Sucesso - Com produtos na página solicitada:
                <pre>   
                {  "statusCode": 200,                 
                   "body": { 
                       "maxRowsPerPage": 50,
                       "page": 2,
                       "rows": [{
-                         "id": 157
+                         "id": 359,
                          "name": "Orange juice"
-                      }]  
+                      },{
+                         "id": 358,
+                         "name": "Other Orange juice"
+                      }, ... ]  
                   }    
                }
                </pre>
-             - Sucesso - Sem produtos na página:
+             - Sucesso - Sem produtos na página solicitada:
                <pre>   
                {  "statusCode": 200,                 
                   "body": { 
@@ -316,7 +320,19 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
       product_units numeric(7,3),
       product_unit_price numeric(11,2),
       product_unit_amount numeric(12,2),
-      CONSTRAINT orderproduct_pkey PRIMARY KEY (order_id)
+      CONSTRAINT orderproduct_pkey PRIMARY KEY (order_id, product_id)
   )
   </pre>   
+
+---
+## Testes
+Os testes unitários foram implementados com o framework unittest, e estão no script "tdd/py_api_test_product.py".
+
+Os testes remotos da API, podem ser feitos pelo https://www.postman.com/ ou pela biblioteca curl ou qualquer outra aplicação/biblioteca.
+
+---
+## ToDo
+- CRUD dos clientes;
+- CRUD dos pedidos;
+
 

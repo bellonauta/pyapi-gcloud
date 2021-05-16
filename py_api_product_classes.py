@@ -115,7 +115,7 @@ class InsertProduct(cls.InsertMasterRecord):
         if super().execute():                  
             fieldValues = {'active': cts._YES} # Marca o produto como ativo na inclusão
          
-            # Lê os atributos do schema e faz relay para os campos da tabela...
+            # Lê os atributos do schema e faz relay para os campos da tabela...           
             for a in self.get_schema()['properties'].keys():
                 if a != 'id' and a != 'manufacturer':
                     # Desvia do "id" que é PK auto-incremento e do "manufacturer" que é tratado em outra classe.
@@ -159,7 +159,7 @@ class UpdateProduct(cls.UpdateMasterRecord):
                                    fields=fieldValues
                                 )        
             if self.get_db().get_error():
-                self.set_error(self.get_db().get_error_message())    
+                self.set_error(self.get_db().get_error_message(), (404 if self.get_db().key_not_found() else 400))    
             else:
                 # Reserva a chave primária alterada...
                 self.set_primary_key(pk)                              
@@ -185,7 +185,7 @@ class DeleteProduct(cls.DeleteMasterRecord):
                                fields=fieldValues
                             )        
         if self.get_db().get_error():
-            self.set_error(self.get_db().get_error_message())    
+            self.set_error(self.get_db().get_error_message(), (404 if self.get_db().key_not_found() else 400))     
         else:
             # Reserva a chave primária excluída(desativada)...
             self.set_primary_key(pk)                              
@@ -280,4 +280,4 @@ class GetProduct(cls.GetMasterRecord):
             self.set_request(request)                            
         #    
         return not self.get_error()      
-#--------------------------------------------------------------------------------------     
+#--------------------------------------------------------------------------------------    

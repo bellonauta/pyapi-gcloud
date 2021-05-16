@@ -292,7 +292,7 @@ class UpdateManufacturer(cls.UpdateDetailRecord):
                                    fields={ 'name': self.__manufacturer_name }
                                 )        
             if self.get_db().get_error():
-                self.set_error(self.get_db().get_error_message())    
+                self.set_error(self.get_db().get_error_message(), (404 if self.get_db().key_not_found() else 400))      
             else:
                 # Reserva a chave primária alterada...
                 self.set_primary_key(pk)                              
@@ -425,7 +425,7 @@ class UpdateProductManufacturer(cls.UpdateDetailRecord):
                                    fields={ 'active': cts._NO }
                                 )        
             if self.get_db().get_error():
-                self.set_error(self.get_db().get_error_message())    
+                self.set_error(self.get_db().get_error_message(), (404 if self.get_db().key_not_found() else 400))      
             else:
                 # Por fim, insere a nova associação...
                 self.get_db().insert(  table='productmanufacturer', 
@@ -466,7 +466,7 @@ class DeleteProductManufacturer(cls.DeleteDetailRecord):
                                    fields={ 'active': cts._NO }
                                 )        
             if self.get_db().get_error():
-                self.set_error(self.get_db().get_error_message()) 
+                self.set_error(self.get_db().get_error_message(), (404 if self.get_db().key_not_found() else 400))   
             else:
                 # Reserva a chave primária(Parcial/Master)...
                 self.set_primary_key({ 'product_id': self.__product_id })           

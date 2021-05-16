@@ -11,7 +11,7 @@ _IN_PRODUCTION = False
 _PG_CONNECTION = {
     'host': 'totvs.cvxv5cunrlzo.sa-east-1.rds.amazonaws.com',
     'port': 5432,
-    'name': 'pyapi',
+    'name': 'totvs',
     'user': 'belonauta',
      'pwd': '03*1966pg'
 }
@@ -28,7 +28,7 @@ _DEL = 'DELETE'
 _HTTP_METHODS = [_GET, _PUT, _POST, _DEL]
 
 # URL das APIs...
-_API_PRODUCT = 'https://3khfi4cf71.execute-api.sa-east-1.amazonaws.com/prod'
+_API_PRODUCT = 'https://3khfi4cf71.execute-api.sa-east-1.amazonaws.com/prod/product'
 
 # Constantes para queries...
 _QRY_PAGE_ROWS_LIMIT = 50

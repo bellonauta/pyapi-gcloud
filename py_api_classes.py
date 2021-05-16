@@ -22,22 +22,39 @@ class ErrorHandlerClass:
         # Privates...
         self.__error = False
         self.__error_message = ''
+        self.__error_code = 0
 
-    def set_error(self, msg):    
-        '''Seta erro e mensagem(msg) na classe.'''
+    def set_error(self, msg, code=400):    
+        '''Seta mensagem(msg) e código do erro na classe.'''
         self.__error = True
         self.__error_message = msg
+        self.__error_code = code
+        
+    def get_error(self) -> bool: 
+        return self.__error          
 
     def get_error_message(self) -> str:       
         return self.__error_message
-
-    def get_error(self) -> bool: 
-        return self.__error            
     
+    def get_error_code(self):       
+        return self.__error_code                 
 #---------------------------------------------------------------------------------      
 
 
 class DatabaseInterface(ErrorHandlerClass):    
+    """ Interface para wrapper de banco de dados. """
+    
+    @abstractmethod
+    def readable_exception(self, exception_err):
+        """
+        Formata e retorna uma mensagem de erro, pela exception
+        ocorrida, mais legível.
+        """ 
+        pass
+    
+    @abstractmethod
+    def key_not_found(self) -> bool:
+        pass    
    
     @abstractmethod
     def connect(self, connParameters:dict) -> bool:
@@ -134,10 +151,13 @@ class DBPostgres(DatabaseInterface):
         self.__connection = None
         self.__in_transaction = False
         
+        self.__key_not_found = False
+       
+        
     def readable_exception(self, exception_err):
         """
-        Formata uma mensagem de erro PG pela exception ocorrida, para
-        que fique mais legível.
+        Formata e retorna uma mensagem de erro PG, pela exception
+        ocorrida, mais legível.
         """ 
         ret = ''
         if exception_err:
@@ -153,8 +173,15 @@ class DBPostgres(DatabaseInterface):
         else:
             ret = 'Exception desconhecida.' 
         #       
-        return ret    
-        
+        return ret  
+    
+    def key_not_found(self) -> bool:
+        """ 
+        Retornar True logo após a tentativa de uma operação de 
+        alteração/exclusão de chave/registro não existente.
+        """        
+        return self.__key_not_found    
+          
     def connect(self, conn_pars:dict) -> bool:
         """ 
         Tenta a conexão com o banco PostgreSQL.
@@ -237,7 +264,7 @@ class DBPostgres(DatabaseInterface):
           bool commit: Passe True quando o commit deva ser executado após a execução da query.
         Retorna bool True/False: Quanto ao sucesso na execução.
         """
-        self.__rows = []
+        self.__rows = []        
         #
         if self.is_connected():
             cursor = self.__connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -277,7 +304,7 @@ class DBPostgres(DatabaseInterface):
            str table: Nome da tabela par incluir o registro
            dict fields: Um dict com os campos e valores para inclusão no formato {nome_col: value,...}
            str sufix: SQL command, opcional, que será adicionado no final da clásula de inclusão gerada
-        """
+        """       
         #
         sql = 'INSERT INTO ' +table+ ' ('+fns.implode(',',list(fields.keys()))+') VALUES (%(' + fns.implode(')s,%(',list(fields.keys())) + ')s)'
         #
@@ -295,27 +322,33 @@ class DBPostgres(DatabaseInterface):
            str table: Nome da tabela par incluir o registro
            dict pk: Um dict com os campos e valores da PK da tabela no formato {nome_col: value,...}
            dict fields: Um dict com os campos e valores para inclusão no formato {nome_col: value,...}.
-        """     
-        parameters = {}           
-        sets = ''
-        pkwhere = ''
-        pkcols = list(pk.keys())           
-        setcols = list(fields.keys())
-        p = 0
-        #
-        for c in pkcols:
-            p += 1
-            parameters['p'+str(p)] = pk[c]
-            pkwhere += (' and ' if pkwhere != '' else '') + c + ' = %(' + 'p'+str(p) + ')s'
-        #    
-        for c in setcols:
-            p += 1
-            parameters['p'+str(p)] = fields[c]    
-            sets += ('' if sets == '' else ', ') + c + ' = %(' + 'p'+str(p) + ')s'   
-        #                        
-        sql = 'UPDATE '+ table +' SET '+ sets +' WHERE '+ pkwhere
-        #
-        self.query(sql=sql, pars=parameters, commit=False)                           
+        """   
+        self.__key_not_found = False  
+        self.count_all(table=table, condition=pk)
+        if self.get_rows()[0]['count'] == 0:
+            self.__key_not_found = True
+            self.set_error('Tentativa de alterar registro não existente na tabela.')
+        else:             
+            parameters = {}           
+            sets = ''
+            pkwhere = ''
+            pkcols = list(pk.keys())           
+            setcols = list(fields.keys())
+            p = 0
+            #
+            for c in pkcols:
+                p += 1
+                parameters['p'+str(p)] = pk[c]
+                pkwhere += (' and ' if pkwhere != '' else '') + c + ' = %(' + 'p'+str(p) + ')s'
+            #    
+            for c in setcols:
+                p += 1
+                parameters['p'+str(p)] = fields[c]    
+                sets += ('' if sets == '' else ', ') + c + ' = %(' + 'p'+str(p) + ')s'   
+            #                        
+            sql = 'UPDATE '+ table +' SET '+ sets +' WHERE '+ pkwhere
+            #
+            self.query(sql=sql, pars=parameters, commit=False)                           
         #     
         return not self.get_error()    
     
@@ -326,19 +359,25 @@ class DBPostgres(DatabaseInterface):
            str table: Nome da tabela para excluir o registro
            dict pk: Um dict com os campos e valores da PK da tabela no formato {nome_col: value,...}
         """    
-        pkwhere = ''
-        pkcols = list(pk.keys()) 
-        parameters = {}  
-        p = 0
-        #
-        for c in pkcols:
-            p += 1
-            parameters['p'+str(p)] = pk[c]   
-            pkwhere += (' and ' if pkwhere != '' else '') + c + ' = %(' + 'p'+str(p) + ')s'     
-        #                        
-        sql = 'DELETE FROM '+ table +' WHERE '+ pkwhere
-        #
-        self.query(sql=sql, pars=parameters, commit=False)                           
+        self.__key_not_found = False  
+        self.count_all(table=table, condition=pk)
+        if self.get_rows()[0]['count'] == 0:
+            self.__key_not_found = True
+            self.set_error('Tentativa de excluir registro não existente na tabela.')
+        else: 
+            pkwhere = ''
+            pkcols = list(pk.keys()) 
+            parameters = {}  
+            p = 0
+            #
+            for c in pkcols:
+                p += 1
+                parameters['p'+str(p)] = pk[c]   
+                pkwhere += (' and ' if pkwhere != '' else '') + c + ' = %(' + 'p'+str(p) + ')s'     
+            #                        
+            sql = 'DELETE FROM '+ table +' WHERE '+ pkwhere
+            #
+            self.query(sql=sql, pars=parameters, commit=False)                           
         #     
         return not self.get_error()    
     
