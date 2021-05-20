@@ -1,9 +1,9 @@
-# PyApi - API REST de Pedidos de Compra em Python
+# PyApi - API REST de Pedidos de Venda em Python
 
 É uma aplicação exclusivamente de nível backend, intermediário, que
 se propõe apresentar uma implementação de API REST em Python.
 
-Está baseada no atendimento ao processo de pedidos de compras.
+Está baseada no atendimento ao processo de pedidos de vendas.
 Permitirá em seu último release:
 - CRUD de produtos;
 - CRUD de fabricantes;
