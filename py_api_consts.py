@@ -9,7 +9,7 @@ _IN_PRODUCTION = False
 
 # Constantes de conexão com o banco de dados...
 _PG_CONNECTION = {
-    'host': 'totvs.cvxv5cunrlzo.sa-east-1.rds.amazonaws.com',
+    'host': 'localhost',
     'port': 5432,
     'name': 'totvs',
     'user': 'belonauta',
