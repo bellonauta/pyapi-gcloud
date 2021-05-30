@@ -2,6 +2,7 @@
 # Facades para execução dos CRUDs com produtos.
 #--------------------------------------------------------------------
 
+import sys
 from abc import abstractmethod
 import json
 from typing import Union
@@ -33,8 +34,11 @@ class CRUDFacade:
     def get_status_code(self):
         return self.__status_code
     
-    def set_body(self, value):
-        self.__body = value 
+    def set_body(self, value, add_line=False):
+        if add_line and type(value) is str:
+            self.__body = '(L'+str(sys._getframe().f_back.f_lineno)+') ' + value
+        else:    
+            self.__body = value
     
     def get_body(self):    
         return self.__body
@@ -62,7 +66,7 @@ class PUTProductFacade(CRUDFacade):
     def execute(self):    
         """ 
         Executa o PUT. 
-        Inicializa as propriedade __status_code e __body.
+        Inicializa as propriedades __status_code e __body.
         Retorna:
            bool True/False quanto ao sucesso na execução.
         """
@@ -95,10 +99,10 @@ class PUTProductFacade(CRUDFacade):
                                                                                           ) 
                                 if not insertProductManufacturer.execute():                                           
                                     self.set_status_code(insertProductManufacturer.get_error_code())
-                                    self.set_body(insertProductManufacturer.get_error_message())
+                                    self.set_body(insertProductManufacturer.get_error_message(), True)
                             else:   
                                 self.set_status_code(400)
-                                self.set_body(insertManufacturer.get_error_message())   
+                                self.set_body(insertManufacturer.get_error_message(), True)   
                         elif checkManufacturerPUTRequest.get_update_manufacturer():      
                             # Atualiza o fabricante do produto... 
                             updateManufacturer = manu.UpdateManufacturer(  manufacturer_id=checkManufacturerPUTRequest.get_manufacturer_id(),
@@ -107,10 +111,10 @@ class PUTProductFacade(CRUDFacade):
                                                                             )
                             if not updateManufacturer.execute():
                                 self.set_status_code(updateManufacturer.get_error_code())
-                                self.set_body(updateManufacturer.get_error_message())   
+                                self.set_body(updateManufacturer.get_error_message(), True)      
                     else:   
                         self.set_status_code(400)
-                        self.set_body(checkManufacturerPUTRequest.get_error_message())
+                        self.set_body(checkManufacturerPUTRequest.get_error_message(), True)   
                                
                     # Response...
                     if self.get_status_code() == 200: 
@@ -122,11 +126,11 @@ class PUTProductFacade(CRUDFacade):
                                     
                 else:   
                     self.set_status_code(insertProduct.get_error_code())
-                    self.set_body(insertProduct.get_error_message())
+                    self.set_body(insertProduct.get_error_message(), True)   
                       
             else:   
                 self.set_status_code(checkPUTRequest.get_error_code())
-                self.set_body(checkPUTRequest.get_error_message())
+                self.set_body(checkPUTRequest.get_error_message(), True)   
                 
             # Commit & Rollback...
             if self.get_db().in_transaction():
@@ -134,7 +138,7 @@ class PUTProductFacade(CRUDFacade):
                 if self.get_status_code() == 200:
                     if not self.get_db().commit():
                         self.set_status_code(self.get_db().get_error_code())
-                        self.set_body(self.get_db().get_error_message())
+                        self.set_body(self.get_db().get_error_message(), True)   
                 #      
                 # Rollback...
                 if self.get_status_code() != 200:
@@ -143,7 +147,7 @@ class PUTProductFacade(CRUDFacade):
                    
         else:   
             self.set_status_code(self.get_db().get_error_code())
-            self.set_body(self.get_db().get_error_message())          
+            self.set_body(self.get_db().get_error_message(), True)             
         #
         return self.get_status_code() == 200
     
@@ -191,34 +195,34 @@ class POSTProductFacade(CRUDFacade):
                                                                                           ) 
                                 if not insertProductManufacturer.execute():                                           
                                     self.set_status_code(insertProductManufacturer.get_error_code())
-                                    self.set_body(insertProductManufacturer.get_error_message())
-                                else:   
-                                    self.set_status_code(insertManufacturer.get_error_code())
-                                    self.set_body(insertManufacturer.get_error_message())   
-                            elif checkManufacturerPOSTRequest.get_update_manufacturer():      
-                               # Atualiza o fabricante do produto... 
-                               updateManufacturer = manu.UpdateManufacturer(  manufacturer_id=checkManufacturerPOSTRequest.get_manufacturer_id(),
-                                                                              manufacturer_name=checkManufacturerPOSTRequest.get_manufacturer_name(), 
-                                                                              db=self.get_db()
+                                    self.set_body(insertProductManufacturer.get_error_message(), True) 
+                            else:   
+                                 self.set_status_code(insertManufacturer.get_error_code())
+                                 self.set_body(insertManufacturer.get_error_message(), True)    
+                        elif checkManufacturerPOSTRequest.get_update_manufacturer():      
+                            # Atualiza o fabricante do produto... 
+                            updateManufacturer = manu.UpdateManufacturer(  manufacturer_id=checkManufacturerPOSTRequest.get_manufacturer_id(),
+                                                                           manufacturer_name=checkManufacturerPOSTRequest.get_manufacturer_name(), 
+                                                                           db=self.get_db()
                                                                            )
-                               if not updateManufacturer.execute():                                       
-                                   self.set_status_code(updateManufacturer.get_error_code())
-                                   self.set_body(updateManufacturer.get_error_message())
-                            #                               
-                            if self.get_status_code() == 200:
-                                if checkManufacturerPOSTRequest.get_update_product():
-                                    # Troca de fabricante do produto...                                                      
-                                    updateProductManufacturer = manu.UpdateProductManufacturer(  product_id=updateProduct.get_primary_key()['id'],
-                                                                                                 manufacturer_id=checkManufacturerPOSTRequest.get_manufacturer_id(), 
-                                                                                                 db=self.get_db()
-                                                                                              ) 
-                                    if not updateProductManufacturer.execute():                                           
-                                        self.set_status_code(updateProductManufacturer.get_error_code())
-                                        self.set_body(updateProductManufacturer.get_error_message())                                                                         
+                            if not updateManufacturer.execute():                                       
+                                self.set_status_code(updateManufacturer.get_error_code())
+                                self.set_body(updateManufacturer.get_error_message(), True) 
+                        #                               
+                        if self.get_status_code() == 200:
+                            if checkManufacturerPOSTRequest.get_update_product():
+                                # Troca de fabricante do produto...                                                      
+                                updateProductManufacturer = manu.UpdateProductManufacturer(  product_id=updateProduct.get_primary_key()['id'],
+                                                                                             manufacturer_id=checkManufacturerPOSTRequest.get_manufacturer_id(), 
+                                                                                             db=self.get_db()
+                                                                                          ) 
+                                if not updateProductManufacturer.execute():                                           
+                                    self.set_status_code(updateProductManufacturer.get_error_code())
+                                    self.set_body(updateProductManufacturer.get_error_message(), True)                                                                          
                                    
                     else:   
                         self.set_status_code(400)
-                        self.set_body(checkManufacturerPOSTRequest.get_error_message())     
+                        self.set_body(checkManufacturerPOSTRequest.get_error_message(), True)      
                                
                     # Response(json encode)...
                     if self.get_status_code() == 200:
@@ -230,11 +234,11 @@ class POSTProductFacade(CRUDFacade):
                                     
                 else:   
                     self.set_status_code(updateProduct.get_error_code())
-                    self.set_body(updateProduct.get_error_message())
+                    self.set_body(updateProduct.get_error_message(), True) 
                            
             else:   
                 self.set_status_code(checkPOSTRequest.get_error_code())
-                self.set_body(checkPOSTRequest.get_error_message())
+                self.set_body(checkPOSTRequest.get_error_message(), True) 
                 
             # Commit & Rollback...
             if self.get_db().in_transaction():
@@ -242,7 +246,7 @@ class POSTProductFacade(CRUDFacade):
                 if self.get_status_code() == 200:
                     if not self.get_db().commit():
                         self.set_status_code(self.get_db().get_error_code())
-                        self.set_body(self.get_db().get_error_message())
+                        self.set_body(self.get_db().get_error_message(), True) 
                 #      
                 # Rollback...
                 if self.get_status_code() != 200:
@@ -251,7 +255,7 @@ class POSTProductFacade(CRUDFacade):
                 
         else:   
             self.set_status_code(self.get_db().get_error_code())
-            self.set_body(self.get_db().get_error_message())
+            self.set_body(self.get_db().get_error_message(), True) 
         #
         return self.get_status_code() == 200
         
@@ -284,11 +288,11 @@ class GETProductFacade(CRUDFacade):
                  self.set_body(getProduct.get_request())
             else:   
                 self.set_status_code(getProduct.get_error_code())
-                self.set_body(getProduct.get_error_message())
+                self.set_body(getProduct.get_error_message(), True) 
                            
         else:   
             self.set_status_code(checkGETRequest.get_error_code())
-            self.set_body(checkGETRequest.get_error_message())
+            self.set_body(checkGETRequest.get_error_message(), True) 
         #
         return self.get_status_code() == 200    
 
@@ -325,7 +329,7 @@ class DELETEProductFacade(CRUDFacade):
                                                                               ) 
                     if not deleteProductManufacturer.execute():                                           
                         self.set_status_code(deleteProductManufacturer.get_error_code())
-                        self.set_body(deleteProductManufacturer.get_error_message())
+                        self.set_body(deleteProductManufacturer.get_error_message(), True) 
                     else:                              
                         # Response(json encode)...
                         body = checkDELRequest.get_request()
@@ -333,11 +337,11 @@ class DELETEProductFacade(CRUDFacade):
                         self.set_body(body) # Atualiza
                 else:   
                     self.set_status_code(deleteProduct.get_error_code())
-                    self.set_body(deleteProduct.get_error_message())
+                    self.set_body(deleteProduct.get_error_message(), True) 
                            
             else:   
                 self.set_status_code(checkDELRequest.get_error_code())
-                self.set_body(checkDELRequest.get_error_message())
+                self.set_body(checkDELRequest.get_error_message(), True) 
                 
             # Commit & Rollback...
             if self.get_db().in_transaction():
@@ -345,7 +349,7 @@ class DELETEProductFacade(CRUDFacade):
                 if self.get_status_code() == 200:
                     if not self.get_db().commit():
                         self.set_status_code(self.get_db().get_error_code())
-                        self.set_body(self.get_db().get_error_message())
+                        self.set_body(self.get_db().get_error_message(), True) 
                 #      
                 # Rollback...
                 if self.get_status_code() != 200:
@@ -354,7 +358,7 @@ class DELETEProductFacade(CRUDFacade):
                        
         else:   
             self.set_status_code(self.get_db().get_error_code())
-            self.set_body(self.get_db().get_error_message())
+            self.set_body(self.get_db().get_error_message(), True) 
         #
         return self.get_status_code() == 200    
 # ---------------------------------------------------------------------------------------    

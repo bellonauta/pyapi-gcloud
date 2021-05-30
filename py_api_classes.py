@@ -1,3 +1,4 @@
+
 #--------------------------------------------------------------------
 # Biblioteca de classes base para o desafio TOTVS.
 #--------------------------------------------------------------------
@@ -38,8 +39,13 @@ class ErrorHandlerClass:
     
     def get_error_code(self):       
         return self.__error_code                 
-#---------------------------------------------------------------------------------      
 
+    def no_errors(self):    
+        """Elimina o erro registrado."""
+        self.__error = False
+        self.__error_message = ''
+        self.__error_code = 0     
+#---------------------------------------------------------------------------------      
 
 class DatabaseInterface(ErrorHandlerClass):    
     """ Interface para wrapper de banco de dados. """
@@ -226,6 +232,7 @@ class DBPostgres(DatabaseInterface):
                 self.__connection = None 
                 
     def start_transaction(self) -> bool:
+        self.no_errors()
         self.__in_transaction = self.is_connected()
         return self.__in_transaction
     
@@ -233,9 +240,10 @@ class DBPostgres(DatabaseInterface):
         return self.__in_transaction
     
     def commit(self) -> bool:
+        self.no_errors()
         if self.__in_transaction:
             try:
-                self.__connection.commit();          
+                self.__connection.commit()         
             except psycopg2.Error as error:
                 self.set_error(msg='Erro finalizando transação. [{}]'.format(self.readable_exception(error)))       
         #
@@ -244,9 +252,10 @@ class DBPostgres(DatabaseInterface):
         return not self.get_error()
     
     def rollback(self) -> bool:
+        self.no_errors()
         if self.__in_transaction:
             try:
-                self.__connection.rollback();          
+                self.__connection.rollback()         
             except psycopg2.Error as error:
                 self.set_error(msg='Erro cancelando transação. [{}]'.format(self.readable_exception(error)))             
         #
@@ -264,6 +273,7 @@ class DBPostgres(DatabaseInterface):
           bool commit: Passe True quando o commit deva ser executado após a execução da query.
         Retorna bool True/False: Quanto ao sucesso na execução.
         """
+        self.no_errors()
         self.__rows = []        
         #
         if self.is_connected():
@@ -319,7 +329,7 @@ class DBPostgres(DatabaseInterface):
         """
         Executa a alteração de um registro em uma tabela. 
         Parâmetros:
-           str table: Nome da tabela par incluir o registro
+           str table: Nome da tabela para incluir o registro
            dict pk: Um dict com os campos e valores da PK da tabela no formato {nome_col: value,...}
            dict fields: Um dict com os campos e valores para inclusão no formato {nome_col: value,...}.
         """   

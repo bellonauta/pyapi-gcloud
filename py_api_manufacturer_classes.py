@@ -377,12 +377,12 @@ class InsertProductManufacturer(cls.InsertDetailRecord):
            
     def execute(self):       
         if super().execute(): 
-            # Primeiro desativa a associação atual...
+            # Primeiro desativa(se já existir) a associação atual...
             self.get_db().update(  table='productmanufacturer', 
                                    pk={ 'product_id': self.__product_id },
                                    fields={ 'active': cts._NO }
-                                )        
-            if self.get_db().get_error():
+                                )                    
+            if self.get_db().get_error() and not self.get_db().key_not_found(): 
                 self.set_error(self.get_db().get_error_message())    
             else:
                 # Por fim, insere a nova associação...   

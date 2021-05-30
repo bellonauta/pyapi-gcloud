@@ -43,7 +43,7 @@ def lambda_handler(event, context):
                 put_product_facade = facade.PUTProductFacade(body=event['body'], db=database)
                 put_product_facade.execute()
                 ret['statusCode'] = put_product_facade.get_status_code()
-                ret['body'] = put_product_facade.get_body_as_dict()             
+                ret['body'] = put_product_facade.get_body_as_dict()        
             #        
             elif event['httpMethod'] == cts._GET:
                 # Consultas... 

@@ -11,9 +11,9 @@ _IN_PRODUCTION = False
 _PG_CONNECTION = {
     'host': 'localhost',
     'port': 5432,
-    'name': 'totvs',
-    'user': 'belonauta',
-     'pwd': '03*1966pg'
+    'name': 'pyapi',
+    'user': 'postgres',
+     'pwd': 'postgres'
 }
 
 # Constantes de estado/situação/atividade...
