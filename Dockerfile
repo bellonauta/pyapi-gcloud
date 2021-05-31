@@ -14,15 +14,6 @@ ARG INSTALL_NODE="true"
 ARG NODE_VERSION="lts/*"
 RUN if [ "${INSTALL_NODE}" = "true" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
 
-# Extensão psycopg2...
-RUN pip3 install psycopg2
-
-# Extensão jsonschema validator...
-RUN pip3 install jsonschema
-
-# Extensão typing union...
-RUN pip3 install union
-
 # [Optional] If your requirements rarely change, uncomment this section to add them to the image.
 # COPY requirements.txt /tmp/pip-tmp/
 # RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
@@ -31,6 +22,24 @@ RUN pip3 install union
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
+
+RUN pip3 freeze > requirements.txt
+
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
+
+
+COPY . .
+
+EXPOSE 8080
+
+# Entrypoint para testes...
+#CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"] 
+
+# Entrypoint para deploy...
+# Para MTS, acrescente os parâmetros: --master --processes 4 --threads 2
+CMD [ "uwsgi", "--http", ":8080", "-w", "api:application" ] 
+
 
 
 

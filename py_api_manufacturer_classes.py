@@ -321,10 +321,7 @@ class GetManufacturer(cls.GetDetailRecord):
           #    
           super().__init__(schema=schema, request=request, db=db)              
         
-    def execute(self):        
-        getType = 'L' # Listagem é default
-        parameters = {'id': self.get_request()['id']}
-        #
+    def execute(self):           
         # Define o tipo da consulta...        
         #  OBS: Num ambiente profissional, já existirá uma padronização/metodologia para
         #       a nomenclatura das coluna do SELECT. Usarei no momento, a mais básica possível.
@@ -336,16 +333,15 @@ class GetManufacturer(cls.GetDetailRecord):
             sql = ('SELECT id, name '+
                    'FROM manufacturer '+
                    'WHERE id > %(id)s '+
-                   'ORDER BY ' + ('id' if self.get_request()['order'] == '' else self.get_request()['order']) +' '+
+                   'ORDER BY ' + ('id' if order == '' else order) +' '+
                    'LIMIT '+ fns.to_str(cts._QRY_PAGE_ROWS_LIMIT) +' OFFSET '+ fns.to_str((self.get_request()['page']-1) * cts._QRY_PAGE_ROWS_LIMIT))            
         else:
             # Detalhes...                 
-            getType = 'D'
             sql = ('SELECT id, name '+
                    'FROM manufacturer '+                          
                    'WHERE id = %(id)s') 
         #
-        self.get_db().query(sql=sql, pars=parameters, commit=True) 
+        self.get_db().query(sql=sql, pars={'id': self.get_request()['id']}, commit=True) 
         if (self.get_db().get_error()):
             self.set_error(self.get_db().get_error_message())
         else:

@@ -1,7 +1,7 @@
 # PyApi - API REST de Pedidos de Venda em Python
 
-É uma aplicação exclusivamente de nível backend, intermediário, que
-se propõe apresentar uma implementação de API REST em Python.
+É uma aplicação exclusivamente de nível backend, intermediário, que se
+propõe apresentar uma implementação, conteinerizada com docker, de uma API REST em Python.
 
 Está baseada no atendimento ao processo de pedidos de vendas.
 Permitirá em seu último release:
@@ -14,16 +14,19 @@ Nesse primeiro release, estão implementados somente os CRUDs para produtos e fa
 
 ---
 ## Dependências
-- Python 3.8
-    - typing (AbstractSet e Union)
+- Python >= 3.7
+    - typing (+AbstractSet e Union)
     - json
-    - jsonschema (validate)
-    - psycopg2 (extras)
-    - abc (abstractmethod)
+    - jsonschema (+validate)
+    - psycopg2 (+extras)
+    - abc (+abstractmethod)
     - unittest
 
-- Cloud
-    - AWS - API Gateway, Lambda e RDS(PostgreSQL)
+- PostgreSQL >= 9.6    
+
+- VSCode
+- WSL2 (Desenvolvido no distro Debian)
+- Docker & Docker Desktop(Windows)
 
 ---
 ## CRUDs de produtos e fabricantes

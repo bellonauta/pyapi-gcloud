@@ -28,11 +28,7 @@ import lamba_rest_products as api
 class ProductAPITests(unittest.TestCase):
 
     def test_insert_product_with_new_manufacturer(self):
-        """ Teste de inclusão de produto e fabricante. """  
-        
-        # Irão receber IDs para testes...
-        productId = 0                  
-        manufacturerId = 0
+        """ Teste de inclusão de produto e fabricante. """                
         
         # Arrange...
         body = { 
@@ -72,28 +68,21 @@ class ProductAPITests(unittest.TestCase):
         
         self.assertEqual('manufacturer' in put['body'].keys(), True, 'O atributo "manufacturer" não foi retornado.')
         self.assertEqual('id' in put['body']['manufacturer'].keys(), True, 'O atributo "manufacturer.id" não foi retornado.')
-        self.assertEqual(type(put['body']['manufacturer']['id']), int, 'O atributo "manufacturer.id" deve ser do tipo "int" mas é do tipo "'+type(put['body']['manufacturer']['id']).__name__+'".')
-        
-        # Reserva os IDs para testes futuros...
-        if jsonLoadsBody and 'id' in put['body'].keys():
-            productId = put['body']['id']        
-        if jsonLoadsBody and 'manufacturer' in put['body'].keys() and 'id' in put['body']['manufacturer'].keys():
-            manufacturerId = put['body']['manufacturer']['id']         
+        self.assertEqual(type(put['body']['manufacturer']['id']), int, 'O atributo "manufacturer.id" deve ser do tipo "int" mas é do tipo "'+type(put['body']['manufacturer']['id']).__name__+'".')        
+            
         
     def test_update_product_and_change_manufacturer(self):
-        """ Teste de alteração de produto com troca de fabricante. """    
-
-        return True    
+        """ Teste de alteração de produto com troca de fabricante. """       
         
         # Arrange...
         body = { 
                   'httpMethod': cts._POST,  
                   'body': json.dumps({     
-                            "id": 1,                   
+                            "id": 206,                    
                             "name": "Correia desdentada",
                             "description": "Correia sem dentes, para polias 'ensopadas'.",
                             "barcode": "12379B64AC86BB",
-                            "manufacturer": { "id": 2 }, # TROCA
+                            "manufacturer": { "id": 203 }, # TROCA
                             # "manufacturer": { "name": "Sacadas & Truques LTDA" }, # INSERE
                             "unitPrice": 20234748.03
                           })   
@@ -128,9 +117,7 @@ class ProductAPITests(unittest.TestCase):
         
     def test_delete_product(self):
         """ Teste de exclusão de produto. """   
-
-        return True     
-        
+       
         # Arrange...
         body = { 
                   'httpMethod': cts._DEL,  
@@ -163,9 +150,7 @@ class ProductAPITests(unittest.TestCase):
         
     def test_get_product(self):
         """ Teste de consulta de produto. """     
-
-        return True   
-        
+       
         # Arrange...
         body = { 
                   'httpMethod': cts._GET,  
@@ -202,5 +187,5 @@ class ProductAPITests(unittest.TestCase):
 # ----------------------------------------------------------------------------------------------------------------------            
 
 # DEBUG...
-test = ProductAPITests()
-test.test_insert_product_with_new_manufacturer()
+# test = ProductAPITests()
+# test.test_insert_product_with_new_manufacturer()
