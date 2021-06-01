@@ -3,13 +3,18 @@
 # manutenção e consulta de produtos.
 #--------------------------------------------------------------------
 
+import sys
 import json
 
 from typing import AbstractSet, Union
+
 import py_api_consts as cts
 import py_api_functions as fns               
 import py_api_classes as cls          
 import py_api_product_facades as facade
+
+# Parâmetros de conexão PostgreSQL...
+from db.pg_conn import _PG_CONNECTION
 
 def handler(event, context, in_production=False):
     # Estrutura para o retorno da API...
@@ -35,7 +40,7 @@ def handler(event, context, in_production=False):
         ret['body'] = {"message": 'A query do request não foi postada ou está vazia.'}            
     else:
         # Conexão com o banco PostgreSQL...
-        conn_pars = cts._PG_CONNECTION['production'] if in_production else cts._PG_CONNECTION['devel'] # Tipo do ambiente
+        conn_pars = _PG_CONNECTION['production'] if in_production else _PG_CONNECTION['devel'] # Tipo do ambiente
         database = cls.DBPostgres()  # Wrapper      
         if database.connect(conn_pars=conn_pars) :      
             # Atendimento das requisições...            

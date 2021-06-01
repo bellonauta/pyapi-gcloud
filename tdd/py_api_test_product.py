@@ -22,7 +22,7 @@ root_dir = str(Path(__file__).parent.parent)
 sys.path.append(root_dir)
 
 import py_api_consts as cts
-import lamba_rest_products as api
+import rest_products as api_prod
 #----------------------------------------------------------------------------------
 
 class ProductAPITests(unittest.TestCase):
@@ -45,7 +45,7 @@ class ProductAPITests(unittest.TestCase):
                }   
       
         # Act...
-        put = api.lambda_handler(event=body, context='')        
+        put = api_prod.handler(event=body, context='', in_production=False)        
         
         # Asserts...                        
         self.assertEqual(type(put), dict, 'Retorno deve ser do tipo "dict" mas é do tipo "'+ type(put).__name__ +'".')
@@ -89,7 +89,7 @@ class ProductAPITests(unittest.TestCase):
                }   
       
         # Act...
-        post = api.lambda_handler(event=body, context='')        
+        post = api_prod.handler(event=body, context='', in_production=False)            
         
         # Asserts...        
         self.assertEqual(type(post), dict, 'Retorno deve ser do tipo "dict" mas é do tipo "'+ type(post).__name__ +'".')
@@ -127,7 +127,7 @@ class ProductAPITests(unittest.TestCase):
                }   
       
         # Act...
-        post = api.lambda_handler(event=body, context='')        
+        post = api_prod.handler(event=body, context='', in_production=False)            
         
         # Asserts...        
         self.assertEqual(type(post), dict, 'Retorno deve ser do tipo "dict" mas é do tipo "'+ type(post).__name__ +'".')
@@ -162,7 +162,7 @@ class ProductAPITests(unittest.TestCase):
                }   
       
         # Act...
-        get = api.lambda_handler(event=body, context='')        
+        get = api_prod.handler(event=body, context='', in_production=False)    
         
         # Asserts...        
         self.assertEqual(type(get), dict, 'Retorno deve ser do tipo "dict" mas é do tipo "'+ type(get).__name__ +'".')
