@@ -1,12 +1,16 @@
+#-------------------------------------------------------------------------
+# Starter da aplicação.
+# --> Execute diretamente quando para debug.
+#-------------------------------------------------------------------------
+
 import os
 import json
-
-from flask import Flask, request
 
 import py_api_consts as cst
 import rest_products as rest
 import py_api_functions as fns
 
+from flask import Flask, request
 
 # Define tipo do ambiente de execução...
 in_production = (os.environ.get('IN_PRODUCTION') != None and os.environ['IN_PRODUCTION'] == 1)
@@ -30,6 +34,6 @@ def api():
     return rest.handler(event=request_pars, context="", in_production=in_production)
 
 if __name__ == '__main__':
-    # run app in debug mode on port 5000
+    # Quando esse script é executado diretamente(__main__), será em debug mode na porta 5000.
     # >python3 app.py
     application.run(debug=True, port=5000)    

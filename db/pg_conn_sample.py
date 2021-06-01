@@ -1,5 +1,6 @@
 #--------------------------------------------------------------------
 # Exemplo de parâmetros para conexão com o PostgreSQL.
+#  ---> Copie esse arquivo para um de nome "pg_conn.py".
 #--------------------------------------------------------------------
 
 # Constantes de conexão com o banco de dados...
