@@ -1,7 +1,8 @@
-# PyApi - API REST de Pedidos de Venda em Python
+# PyApi - API REST de Pedidos de Venda em Python - Google Cloud Run
 
 É uma aplicação exclusivamente de nível backend, intermediário, que se
 propõe apresentar uma implementação, conteinerizada com docker, de uma API REST em Python.
+O conteiner gerado está configurado para ser "dockado" no Google Cloud Run.
 
 Está baseada no atendimento ao processo de pedidos de vendas.
 Permitirá em seu último release:
@@ -27,10 +28,11 @@ Nesse primeiro release, estão implementados somente os CRUDs para produtos e fa
 - VSCode
 - WSL2 (Desenvolvido no distro Debian)
 - Docker & Docker Desktop(Windows)
+- Google cloud run
 
 ---
 ## CRUDs de produtos e fabricantes
-- API: https://3khfi4cf71.execute-api.sa-east-1.amazonaws.com/prod/product
+- API: ???????????????
 
 - **PUT** - Inclusão de produtos
     - Solicitação tipo 1 - Com associação de fabricante já cadastrado ao produto:
