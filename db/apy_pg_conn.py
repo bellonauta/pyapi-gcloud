@@ -12,10 +12,10 @@ _PG_CONNECTION = {
                         'pwd': 'postgres'
                     },
                     'production': {
-                       'host': '35.199.98.84', # Gcloud
+                       'host': 'mycloud.com',
                        'port': 5432,
-                       'name': 'gcloud',
+                       'name': 'pyapi',
                        'user': 'postgres',
-                        'pwd': '03*1966pggc'
+                        'pwd': 'postgres'
                     }
 }                                            
