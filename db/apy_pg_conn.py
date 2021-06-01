@@ -16,6 +16,6 @@ _PG_CONNECTION = {
                        'port': 5432,
                        'name': 'pyapi',
                        'user': 'postgres',
-                        'pwd': 'postgress'
+                        'pwd': 'postgress1'
                     }
 }                                            
