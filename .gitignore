@@ -4,6 +4,7 @@ log.log
 .vscode
 __pycache__
 db
+db/apy_pg_conn.py
 **/.vscode-test/**
 **/.vscode test/**
 **/.vscode-smoke/**
@@ -12,3 +13,4 @@ db
 tmp/**
 .python-version
 .vs/
+
