@@ -4,6 +4,7 @@ log.log
 .vscode
 __pycache__
 db/pg_conn.py
+pg_conn.py
 **/.vscode-test/**
 **/.vscode test/**
 **/.vscode-smoke/**
