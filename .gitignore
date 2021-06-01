@@ -3,7 +3,7 @@ log.log
 **/.vscode/.ropeproject/**
 .vscode
 __pycache__
-aws
+db
 **/.vscode-test/**
 **/.vscode test/**
 **/.vscode-smoke/**

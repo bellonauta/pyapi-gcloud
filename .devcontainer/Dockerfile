@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/vscode/devcontainers/python:0-${VARIANT}
 
 # Tipo do ambiente de execução do Dockerfile...
 #    0 = False(Devel)  1 = True
-ENV IN_PRODUCTION = 1  
+ENV IN_PRODUCTION = 0  
 
 ENV PYTHONUNBUFFERED 1
 
@@ -33,16 +33,16 @@ COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
 
-COPY . .
+# COPY . .
 
-EXPOSE 8080
+# EXPOSE 8080
 
 # Entrypoint para testes...
-#CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"] 
+# CMD [ "python3", "app.py"] 
 
 # Entrypoint para deploy...
 # Para MTS, acrescente os parâmetros: --master --processes 4 --threads 2
-CMD [ "uwsgi", "--http", ":8080", "-w", "api:application" ] 
+#CMD [ "uwsgi", "--http", ":8080", "-w", "api:application" ] 
 
 
 

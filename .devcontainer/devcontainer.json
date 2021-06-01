@@ -37,6 +37,7 @@
 
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
+		"ms-python.vscode-pylance",
 		"ms-python.python",
 		"mtxr.sqltools",
 		"mtxr.sqltools-driver-pg"
