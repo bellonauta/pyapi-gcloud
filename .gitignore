@@ -3,7 +3,7 @@ log.log
 **/.vscode/.ropeproject/**
 .vscode
 __pycache__
-db/apy_pg_conn.py
+db/pg_conn.py
 **/.vscode-test/**
 **/.vscode test/**
 **/.vscode-smoke/**
