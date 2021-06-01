@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------
-# Exemplo de Biblioteca de constantes para conexão com o PostgreSQL.
+# Exemplo de parâmetros para conexão com o PostgreSQL.
 #--------------------------------------------------------------------
 
 # Constantes de conexão com o banco de dados...
