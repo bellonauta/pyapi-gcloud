@@ -1,10 +1,12 @@
+# Dockerfile do ambiente de desenvolvimento.
+
 # [Choice] Python version: 3, 3.8, 3.7, 3.6
 ARG VARIANT=3
 FROM mcr.microsoft.com/vscode/devcontainers/python:0-${VARIANT}
 
 # Tipo do ambiente de execução do Dockerfile...
-#    0 = False(Devel)  1 = True
-ENV IN_PRODUCTION = 0  
+#    "0" = False(Devel)  "1" = True
+ENV IN_PRODUCTION "0"  
 
 ENV PYTHONUNBUFFERED 1
 
@@ -31,19 +33,3 @@ RUN pip3 freeze > requirements.txt
 
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
-
-
-# COPY . .
-
-# EXPOSE 8080
-
-# Entrypoint para testes...
-# CMD [ "python3", "app.py"] 
-
-# Entrypoint para deploy...
-# Para MTS, acrescente os parâmetros: --master --processes 4 --threads 2
-#CMD [ "uwsgi", "--http", ":8080", "-w", "api:application" ] 
-
-
-
-

@@ -35,7 +35,6 @@ ser "dockado" no Google Cloud Run.
 
 ---
 ## CRUDs de produtos e fabricantes
-- API: ???????????????
 
 - **PUT** - Inclusão de produtos
     - Solicitação tipo 1 - Com associação de fabricante já cadastrado ao produto:
@@ -337,6 +336,16 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
 Os testes unitários foram implementados com o framework unittest, e estão no script "tdd/py_api_test_product.py".
 
 Os testes remotos da API, podem ser feitos pelo https://www.postman.com/ ou pela biblioteca curl ou qualquer outra aplicação/biblioteca.
+
+## Deploy
+A API foi desenvolvida para dockagem no Google Cloud Run, com a
+extensão "Cloud Code" do VSCode.
+
+Antes do deploy, verifique:
+
+- Se a configuração de acesso ao banco PostgreSQL está corretamente definida no script "db/pg_conn.py". Esse script deve ser uma criado, através da cópia do script de exemplo "db/pg_conn_sample.py";
+- Se a porta do entrypoint está corretamente configurada no Dockerfile de deploy, na diretiva "CMD", conforme sua configuração no Google Cloud Run. O padrão é a resposta da API na porta tcp 8080.
+
 
 ---
 ## ToDo

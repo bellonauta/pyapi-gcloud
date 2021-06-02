@@ -13,7 +13,7 @@ import py_api_functions as fns
 from flask import Flask, request
 
 # Define tipo do ambiente de execução...
-in_production = (os.environ.get('IN_PRODUCTION') != None and os.environ['IN_PRODUCTION'] == 1)
+in_production = (os.environ.get('IN_PRODUCTION') != None and os.environ['IN_PRODUCTION'] == "1")
 
 application = Flask(__name__)
 @application.route('/', methods=cst._HTTP_METHODS)
@@ -31,7 +31,9 @@ def api():
         else:
              request_pars['body'] = request.json
     #
-    return rest.handler(event=request_pars, context="", in_production=in_production)
+    response = rest.handler(event=request_pars, context="", in_production=in_production)
+    #
+    return response
 
 if __name__ == '__main__':
     # Quando esse script é executado diretamente(__main__), será em debug mode na porta 5000.

@@ -1,10 +1,12 @@
+# Dockerfile para deploy.
+
 # [Choice] Python version: 3, 3.8, 3.7, 3.6
 ARG VARIANT=3
 FROM mcr.microsoft.com/vscode/devcontainers/python:0-${VARIANT}
 
 # Tipo do ambiente de execução do Dockerfile...
-#    0 = False(Devel)  1 = True
-ENV IN_PRODUCTION = 1  
+#    "0" = False(Devel)  "1" = True
+ENV IN_PRODUCTION "1" 
 
 ENV PYTHONUNBUFFERED 1
 
@@ -27,7 +29,7 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then groupmod --g
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
 
-RUN pip3 freeze > requirements.txt
+# RUN pip3 freeze > requirements.txt
 
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
@@ -36,9 +38,6 @@ RUN pip3 install -r requirements.txt
 COPY . .
 
 EXPOSE 8080
-
-# Entrypoint para testes...
-#CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"] 
 
 # Entrypoint para deploy...
 # Para MTS, acrescente os parâmetros: --master --processes 4 --threads 2
