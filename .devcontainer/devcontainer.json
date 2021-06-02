@@ -41,9 +41,6 @@
 		"ms-python.python",
 		"mtxr.sqltools",
 		"mtxr.sqltools-driver-pg",
-		"ms-ceintl.vscode-language-pack-pt-br",
-		"adamvoss.vscode-languagetool-pt",
-		"sonarsource.sonarlint-vscode"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

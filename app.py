@@ -31,7 +31,7 @@ def api():
         else:
              request_pars['body'] = request.json
     #
-    response = rest.handler(event=request_pars, context="", in_production=in_production)
+    response = rest.handler(request=request_pars, in_production=in_production)
     #
     return response
 
