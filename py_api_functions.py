@@ -1,5 +1,5 @@
 # *------------------------------------------------------------------*
-# *  Biblioteca de funções base para o desafio TOTVS.                *  
+# *  Biblioteca de funções base para a API.                          *  
 # *------------------------------------------------------------------*
 
 import json
@@ -54,7 +54,7 @@ def to_str(val,def_val:str='') -> str:
         else:        
             try:           
                 ret = str(val)  
-            except Exception as error:        
+            except Exception:        
                 ret = def_val
     #         
     return (ret if len(ret) > 0 and (not type(ret) is str or ret.strip() != '') else def_val)     

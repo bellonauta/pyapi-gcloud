@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------
-# Biblioteca de constantes base para o desafio TOTVS.
+# Biblioteca de constantes base para a API.
 #--------------------------------------------------------------------
 
 import json

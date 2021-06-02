@@ -1,7 +1,7 @@
 # PyApi - API REST de Pedidos de Venda em Python 
 
-É uma aplicação exclusivamente de nível backend, intermediário, que se
-propõe apresentar uma implementação, conteinerizada com docker, de uma API REST em Python.
+É uma aplicação exclusivamente de nível backend que se propõe
+apresentar uma implementação, conteinerizada com docker, de uma API REST em Python.
 
 Está baseada no atendimento ao processo de pedidos de vendas.
 Permitirá em seu último release:

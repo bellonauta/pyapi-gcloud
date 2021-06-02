@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------
-# Biblioteca de classes base para o desafio TOTVS.
+# Biblioteca de classes base para a API.
 #--------------------------------------------------------------------
 
 from typing import AbstractSet, Union
