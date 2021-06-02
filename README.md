@@ -278,6 +278,7 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
                </pre>          
 ---
 ## Tabelas
+Se desejar a criação automática das tabelas, restaure o arquivo "db/pg_db.sql" no banco que você criou.
 - Produtos:
   <pre>
   CREATE TABLE schema_name.product
