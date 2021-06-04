@@ -90,3 +90,14 @@ _GET_MANUFACTURER_JSON_SCHEMA = {
        },
        "required": []         
 }   
+
+#---------------------------------------------------------------------------------
+
+# Dict padrão para retorno da API...
+_API_RESPONSE = {
+                   'statusCode': 200, 
+                   'headers': {
+                                 'Content-Type': 'application/json'
+                              },
+                   'body': ''                 
+                }

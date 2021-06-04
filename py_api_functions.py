@@ -58,3 +58,25 @@ def to_str(val,def_val:str='') -> str:
                 ret = def_val
     #         
     return (ret if len(ret) > 0 and (not type(ret) is str or ret.strip() != '') else def_val)     
+
+def get_cmd_arg(args:list, argname:str, default=None):   
+    """
+    Retorna o valor de um argumento/parâmetro contido na lista passada para o script.            
+    Args:
+        args (list): Argumentos recebidos pelo script(sys.argv).
+        argname (str): Nome do argumento a retornar.
+        default (any, optional): Valor a retornar quando argumento não encontrado no array. Defaults to None.
+    Returns:
+        mixed: Valor do argumento ou, se argumento não encontrado, o valor em default
+    """       
+    ret = default
+    argname = argname.strip()
+    if type(args) is list and len(args) > 0 and argname != '':
+        for arg in args:
+           if type(arg) is str: 
+               arg = arg.strip()         
+               if arg != '' and arg[0:len(argname)+1] == argname+'=':     
+                   ret = arg[len(argname)+1:].strip()
+                   break
+    #           
+    return ret

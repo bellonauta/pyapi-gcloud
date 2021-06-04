@@ -36,12 +36,9 @@ def check_request(request):
     elif request['httpMethod'] not in cts._HTTP_METHODS:           
         check['success'] = False
         check['message'] = 'O método de request é desconhecido.'
-    elif request['httpMethod'] != cts._GET and ('body' not in request or fns.is_empty(request['body'])):   
+    elif 'body' not in request or fns.is_empty(request['body']):   
         check['success'] = False
-        check['message'] = 'O body do request não foi postado ou está vazio.'       
-    elif request['httpMethod'] == cts._GET and ('queryStringParameters' not in request or fns.is_empty(request['queryStringParameters'])):   
-        check['success'] = False
-        check['message'] = 'A query do request não foi postada ou está vazia.'            
+        check['message'] = 'O body do request não foi postado ou está vazio.'           
     #
     return check    
 
@@ -58,13 +55,7 @@ def handler(request, in_production=False):
               "body"(dict): Retorno da requisição, conforme documentação no README.md.
     """
     # Estrutura para o retorno da API...
-    response = {
-                   'statusCode': 200, 
-                   'headers': {
-                                 'Content-Type': 'application/json'
-                              },
-                   'body': ''                 
-               }
+    response = cts._API_RESPONSE
     #
     # Consiste estrutura da requisição...
     check = check_request(request=request)
@@ -93,7 +84,7 @@ def handler(request, in_production=False):
             #        
             elif request['httpMethod'] == cts._GET:
                 # Consultas... 
-                get_product_facade = facade.GETProductFacade(body=request['queryStringParameters'], db=database)
+                get_product_facade = facade.GETProductFacade(body=request['body'], db=database)
                 get_product_facade.execute()
                 response['statusCode'] = get_product_facade.get_status_code()
                 response['body'] = get_product_facade.get_body_as_dict()      

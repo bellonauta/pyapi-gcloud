@@ -10,16 +10,16 @@
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
 		"terminal.integrated.shell.linux": "/bin/bash",
-		"sqltools.connections": [{
-			"name": "Container database",
-			"driver": "PostgreSQL",
-			"previewLimit": 50,
-			"server": "localhost",
-			"port": 5432,
-			"database": "postgres",
-			"username": "postgres",
-			"password": "postgres"
-		}],
+		//"sqltools.connections": [{
+		//	"name": "Container database",
+		//	"driver": "PostgreSQL",
+		//	"previewLimit": 50,
+		//	"server": "localhost",
+		//	"port": 5432,
+		//	"database": "postgres",
+		//	"username": "postgres",
+		//	"password": "postgres"
+		//}],
 		"python.pythonPath": "/usr/local/bin/python",
 		"python.linting.enabled": true,
 		"python.linting.pylintEnabled": true,
@@ -39,12 +39,12 @@
 	"extensions": [
 		"ms-python.vscode-pylance",
 		"ms-python.python",
-		"mtxr.sqltools",
-		"mtxr.sqltools-driver-pg",
+		//"mtxr.sqltools",
+		//"mtxr.sqltools-driver-pg",
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [5000, 5432, 8080],
+	"forwardPorts": [5000, /*5432,*/ 8080],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "pip install --user -r requirements.txt",

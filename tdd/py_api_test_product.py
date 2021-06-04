@@ -2,38 +2,43 @@
 # coding:utf-8
 
 #--------------------------------------------------------------------
-# TDD UNITTEST - Testes unitários das APIs dos produtos.
+# TDD UNITTEST - Testes unitários da API dos produtos.
 #--------------------------------------------------------------------
 # a) Para testar, crie uma subpasta do projeto chamada "tdd" e 
 #    coloque esse script dentro dela;
 # b) Por fim, estando dentro da pasta do projet, oexecute
 #    no terminal/prompt:
-#       python -m unittest tdd/py_api_test_product.py
+#       $ python3 tdd/py_api_test_product.py --url=http://dominio:PORTA
+#    O parâmetro "--url" não é obrigatório. Informe-o somente se a
+#    url da API for diferente da padrão(http://localhost:5000)
 #--------------------------------------------------------------------
 
-from typing import AbstractSet, Union
 import sys
-import unittest
 import json
+import requests
+import unittest
+
 from pathlib import Path
+from typing import AbstractSet, Union
+
 
 # Bibliotecas...
 root_dir = str(Path(__file__).parent.parent)
 sys.path.append(root_dir)
 
 import py_api_consts as cts
-import rest_products as api_prod
+import py_api_functions as fns
 #----------------------------------------------------------------------------------
 
 class ProductAPITests(unittest.TestCase):
 
     def test_insert_product_with_new_manufacturer(self):
-        """ Teste de inclusão de produto e fabricante. """                
+        """ Teste de inclusão de produto e fabricante. """                       
         
         # Arrange...
         body = { 
                   'httpMethod': cts._PUT,  
-                  'body': json.dumps({        
+                  'body': {        
                       "name": "Chapuleta da corrêia dentada",
                       "description": "Chapa de aço que vai na chapuleta, folheada a ouro",
                       "barcode": "6466546464645",
@@ -41,34 +46,43 @@ class ProductAPITests(unittest.TestCase):
                                          "name": "SpaceX & NASA",
                                       },
                       "unitPrice": 101234748.01
-                  })   
+                  }   
                }   
       
-        # Act...
-        put = api_prod.handler(event=body, context='', in_production=False)        
-        
-        # Asserts...                        
-        self.assertEqual(type(put), dict, 'Retorno deve ser do tipo "dict" mas é do tipo "'+ type(put).__name__ +'".')
-        self.assertEqual('statusCode' in put.keys(), True, 'O atributo "statusCode" não foi retornado.')
-        self.assertEqual(type(put['statusCode']), int, 'O atributo "statusCode" deve ser do tipo "int" mas é do tipo "'+type(put['statusCode']).__name__+'".')
-        self.assertEqual(200, put['statusCode'], put['body'] if 'body' in put.keys() else 'Erro desconhecido.')        
-        self.assertEqual('body' in put.keys(), True, 'O atributo "body" não foi retornado.')
-        self.assertGreater(len(put['body']) , 0, 'O atributo "body" foi retornado vazio.')
+        # Act...            
+        request_error_exception = None
+        request_error_message = ""
+        put = None
+        try: 
+            put = requests.put(url=api_url, json=body, timeout=10, allow_redirects=True)   
+        except Exception as ex:
+            request_error_exception = type(ex).__name__.strip().lower()                                    
+            request_error_message = str(ex)
+                
+        # Asserts...      
+        self.assertNotEqual(request_error_exception, 'connecttimeout', 'Tempo esgotado para conexão com "'+api_url+'".')                  
+        self.assertEqual(request_error_exception, None, 'Falha na conexão com "'+api_url+'".\n'+request_error_message)                  
+        self.assertEqual(type(put), requests.models.Response, 'Retorno deve ser do tipo "Response" mas é do tipo "'+ type(put).__name__)
+        self.assertEqual('statusCode' in put.json().keys(), True, 'O atributo "statusCode" não foi retornado.')
+        self.assertEqual(type(put.json()['statusCode']), int, 'O atributo "statusCode" deve ser do tipo "int" mas é do tipo "'+type(put.json()['statusCode']).__name__+'".')
+        self.assertEqual(200, put.json()['statusCode'], put.json()['body'] if 'body' in put.json().keys() else 'Erro desconhecido.')        
+        self.assertEqual('body' in put.json().keys(), True, 'O atributo "body" não foi retornado.')
+        self.assertGreater(len(put.json()['body']) , 0, 'O atributo "body" foi retornado vazio.')
         
         try:
-            put['body'] = json.loads(put['body'])       
-            jsonLoadsBody = True
+            body = json.loads(put.json()['body'])       
+            json_valid = True
         except Exception:
-            jsonLoadsBody = False
+            json_valid = False
         
-        self.assertEqual(jsonLoadsBody, True, 'O "body" não contém um json encode válido.')
+        self.assertEqual(json_valid, True, 'O "body" não contém um json encode válido.')
         
-        self.assertEqual('id' in put['body'].keys(), True, 'O atributo "id" não foi retornado.')
-        self.assertEqual(type(put['body']['id']), int, 'O atributo "id" deve ser do tipo "int" mas é do tipo "'+type(put['body']['id']).__name__+'".')
+        self.assertEqual('id' in body.keys(), True, 'O atributo "id" não foi retornado.')
+        self.assertEqual(type(body['id']), int, 'O atributo "id" deve ser do tipo "int" mas é do tipo "'+type(body['id']).__name__+'".')
         
-        self.assertEqual('manufacturer' in put['body'].keys(), True, 'O atributo "manufacturer" não foi retornado.')
-        self.assertEqual('id' in put['body']['manufacturer'].keys(), True, 'O atributo "manufacturer.id" não foi retornado.')
-        self.assertEqual(type(put['body']['manufacturer']['id']), int, 'O atributo "manufacturer.id" deve ser do tipo "int" mas é do tipo "'+type(put['body']['manufacturer']['id']).__name__+'".')        
+        self.assertEqual('manufacturer' in body.keys(), True, 'O atributo "manufacturer" não foi retornado.')
+        self.assertEqual('id' in body['manufacturer'].keys(), True, 'O atributo "manufacturer.id" não foi retornado.')
+        self.assertEqual(type(body['manufacturer']['id']), int, 'O atributo "manufacturer.id" deve ser do tipo "int" mas é do tipo "'+type(body['manufacturer']['id']).__name__+'".')        
             
         
     def test_update_product_and_change_manufacturer(self):
@@ -89,7 +103,7 @@ class ProductAPITests(unittest.TestCase):
                }   
       
         # Act...
-        post = api_prod.handler(event=body, context='', in_production=False)            
+        post = api_prod.handler(request=body, in_production=False)          
         
         # Asserts...        
         self.assertEqual(type(post), dict, 'Retorno deve ser do tipo "dict" mas é do tipo "'+ type(post).__name__ +'".')
@@ -127,7 +141,7 @@ class ProductAPITests(unittest.TestCase):
                }   
       
         # Act...
-        post = api_prod.handler(event=body, context='', in_production=False)            
+        post = api_prod.handler(request=body, in_production=False)             
         
         # Asserts...        
         self.assertEqual(type(post), dict, 'Retorno deve ser do tipo "dict" mas é do tipo "'+ type(post).__name__ +'".')
@@ -162,7 +176,7 @@ class ProductAPITests(unittest.TestCase):
                }   
       
         # Act...
-        get = api_prod.handler(event=body, context='', in_production=False)    
+        get = api_prod.handler(request=body, in_production=False)    
         
         # Asserts...        
         self.assertEqual(type(get), dict, 'Retorno deve ser do tipo "dict" mas é do tipo "'+ type(get).__name__ +'".')
@@ -186,6 +200,29 @@ class ProductAPITests(unittest.TestCase):
         
 # ----------------------------------------------------------------------------------------------------------------------            
 
+def test_suite():
+    suite = unittest.TestSuite()
+    suite.addTest(ProductAPITests('test_insert_product_with_new_manufacturer'))
+    # suite.addTest(ProductAPITests('test_update_product_and_change_manufacturer'))
+    return suite
+# ----------------------------------------------------------------------------------------------------------------------            
+  
+
 # DEBUG...
 # test = ProductAPITests()
 # test.test_insert_product_with_new_manufacturer()
+
+if __name__ == '__main__':  
+   # Pega a URL da API da linha de comando... 
+   api_url = fns.get_cmd_arg(sys.argv, '--url', default=None)
+   if api_url == None:
+       # Não informada - seta a padrão...
+       api_url = 'http://localhost:5000' 
+   elif api_url == '':
+       # Informada vazia(--url=)...
+       print('Comando: python3 tdd/py_api_test_product.py --url=http://dominio:PORTA\n')    
+       sys.exit()
+   #  
+   # Roda os testes...  
+   runner = unittest.TextTestRunner(failfast=True, verbosity=2)
+   runner.run(test_suite()) 
