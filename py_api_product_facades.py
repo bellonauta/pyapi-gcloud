@@ -76,27 +76,27 @@ class PUTProductFacade(CRUDFacade):
             check_put_request = prod.CheckProductPUTRequest(body=self.get_body(), db=self.get_db())
             if check_put_request.execute():
                 # Inclusão...     
-                insert_product = prod.insert_product(  schema=check_put_request.get_schema(), 
-                                                       request=check_put_request.get_request(), 
-                                                       db=self.get_db()
-                                                    )                         
+                insert_product = prod.InsertProduct(  schema=check_put_request.get_schema(), 
+                                                      request=check_put_request.get_request(), 
+                                                      db=self.get_db()
+                                                   )                         
                 if insert_product.execute():
                     # Tratamento do fabricante do produto...
-                    check_manufacturer_put_request = manu.check_manufacturer_put_request(body=self.get_body(), db=self.get_db())
+                    check_manufacturer_put_request = manu.CheckManufacturerPUTRequest(body=self.get_body(), db=self.get_db())
                     if check_manufacturer_put_request.execute():
                         if check_manufacturer_put_request.get_insert_manufacturer():
                             # Inclusão do fabricante...                                                      
-                            insert_manufacturer = manu.insert_manufacturer(  manufacturer_name=check_manufacturer_put_request.get_manufacturer_name(), 
-                                                                             db=self.get_db()
-                                                                          ) 
+                            insert_manufacturer = manu.InsertManufacturer(  manufacturer_name=check_manufacturer_put_request.get_manufacturer_name(), 
+                                                                            db=self.get_db()
+                                                                         ) 
                             if insert_manufacturer.execute():
                                 # Reserva a PK do fabricante incluído...
                                 check_manufacturer_put_request.set_manufacturer_id(insert_manufacturer.get_primary_key()['id'])                                        
                                 # Inclusão do fabricante para o produto...                                                      
-                                insert_product_manufacturer = manu.insert_product_manufacturer(  product_id=insert_product.get_primary_key()['id'],
-                                                                                                 manufacturer_id=check_manufacturer_put_request.get_manufacturer_id(), 
-                                                                                                 db=self.get_db()
-                                                                                              ) 
+                                insert_product_manufacturer = manu.InsertProductManufacturer(  product_id=insert_product.get_primary_key()['id'],
+                                                                                               manufacturer_id=check_manufacturer_put_request.get_manufacturer_id(), 
+                                                                                               db=self.get_db()
+                                                                                            ) 
                                 if not insert_product_manufacturer.execute():                                           
                                     self.set_status_code(insert_product_manufacturer.get_error_code())
                                     self.set_body(insert_product_manufacturer.get_error_message(), True)
@@ -105,10 +105,10 @@ class PUTProductFacade(CRUDFacade):
                                 self.set_body(insert_manufacturer.get_error_message(), True)   
                         elif check_manufacturer_put_request.get_update_manufacturer():      
                             # Atualiza o fabricante do produto... 
-                            update_manufacturer = manu.update_manufacturer(  manufacturer_id=check_manufacturer_put_request.get_manufacturer_id(),
-                                                                             manufacturer_name=check_manufacturer_put_request.get_manufacturer_name(), 
-                                                                             db=self.get_db()
-                                                                          )
+                            update_manufacturer = manu.UpdateManufacturer(  manufacturer_id=check_manufacturer_put_request.get_manufacturer_id(),
+                                                                            manufacturer_name=check_manufacturer_put_request.get_manufacturer_name(), 
+                                                                            db=self.get_db()
+                                                                         )
                             if not update_manufacturer.execute():
                                 self.set_status_code(update_manufacturer.get_error_code())
                                 self.set_body(update_manufacturer.get_error_message(), True)      
@@ -172,27 +172,27 @@ class POSTProductFacade(CRUDFacade):
             check_post_request = prod.CheckProductPOSTRequest(body=self.get_body(), db=self.get_db())
             if check_post_request.execute():
                 # Alteração...     
-                update_product = prod.update_product(  schema=check_post_request.get_schema(), 
-                                                       request=check_post_request.get_request(), 
-                                                       db=self.get_db()
-                                                    )                         
+                update_product = prod.UpdateProduct(  schema=check_post_request.get_schema(), 
+                                                      request=check_post_request.get_request(), 
+                                                      db=self.get_db()
+                                                   )                         
                 if update_product.execute():
                     # Tratamento do fabricante do produto...
-                    check_manufacturer_post_request = manu.check_manufacturer_post_request(body=self.get_body(), db=self.get_db())
+                    check_manufacturer_post_request = manu.CheckManufacturerPOSTRequest(body=self.get_body(), db=self.get_db())
                     if check_manufacturer_post_request.execute():
                         if check_manufacturer_post_request.get_insert_manufacturer():
                             # Inclusão do fabricante...                                                      
-                            insert_manufacturer = manu.insert_manufacturer(  manufacturer_name=check_manufacturer_post_request.get_manufacturer_name(), 
-                                                                             db=self.get_db()
-                                                                          ) 
+                            insert_manufacturer = manu.InsertManufacturer(  manufacturer_name=check_manufacturer_post_request.get_manufacturer_name(), 
+                                                                            db=self.get_db()
+                                                                         ) 
                             if insert_manufacturer.execute():
                                 # Reserva a PK do fabricante incluído...
                                 check_manufacturer_post_request.set_manufacturer_id(insert_manufacturer.get_primary_key()['id'])                                        
                                 # Inclusão do fabricante para o produto...                                                      
-                                insert_product_manufacturer = manu.insert_product_manufacturer(  product_id=update_product.get_primary_key()['id'],
-                                                                                                 manufacturer_id=check_manufacturer_post_request.get_manufacturer_id(), 
-                                                                                                 db=self.get_db()
-                                                                                              ) 
+                                insert_product_manufacturer = manu.InsertProductManufacturer(  product_id=update_product.get_primary_key()['id'],
+                                                                                               manufacturer_id=check_manufacturer_post_request.get_manufacturer_id(), 
+                                                                                               db=self.get_db()
+                                                                                            ) 
                                 if not insert_product_manufacturer.execute():                                           
                                     self.set_status_code(insert_product_manufacturer.get_error_code())
                                     self.set_body(insert_product_manufacturer.get_error_message(), True) 
@@ -201,10 +201,10 @@ class POSTProductFacade(CRUDFacade):
                                  self.set_body(insert_manufacturer.get_error_message(), True)    
                         elif check_manufacturer_post_request.get_update_manufacturer():      
                             # Atualiza o fabricante do produto... 
-                            update_manufacturer = manu.update_manufacturer(  manufacturer_id=check_manufacturer_post_request.get_manufacturer_id(),
-                                                                             manufacturer_name=check_manufacturer_post_request.get_manufacturer_name(), 
-                                                                             db=self.get_db()
-                                                                          )
+                            update_manufacturer = manu.UpdateManufacturer(  manufacturer_id=check_manufacturer_post_request.get_manufacturer_id(),
+                                                                            manufacturer_name=check_manufacturer_post_request.get_manufacturer_name(), 
+                                                                            db=self.get_db()
+                                                                         )
                             if not update_manufacturer.execute():                                       
                                 self.set_status_code(update_manufacturer.get_error_code())
                                 self.set_body(update_manufacturer.get_error_message(), True) 
@@ -212,10 +212,10 @@ class POSTProductFacade(CRUDFacade):
                         if self.get_status_code() == 200:
                             if check_manufacturer_post_request.get_update_product():
                                 # Troca de fabricante do produto...                                                      
-                                update_product_manufacturer = manu.update_product_manufacturer(  product_id=update_product.get_primary_key()['id'],
-                                                                                                 manufacturer_id=check_manufacturer_post_request.get_manufacturer_id(), 
-                                                                                                 db=self.get_db()
-                                                                                              ) 
+                                update_product_manufacturer = manu.UpdateProductManufacturer(  product_id=update_product.get_primary_key()['id'],
+                                                                                               manufacturer_id=check_manufacturer_post_request.get_manufacturer_id(), 
+                                                                                               db=self.get_db()
+                                                                                            ) 
                                 if not update_product_manufacturer.execute():                                           
                                     self.set_status_code(update_product_manufacturer.get_error_code())
                                     self.set_body(update_product_manufacturer.get_error_message(), True)                                                                          
@@ -279,10 +279,10 @@ class GETProductFacade(CRUDFacade):
         check_get_request = prod.CheckProductGETRequest(body=self.get_body(), db=self.get_db())
         if check_get_request.execute():
             # Consulta...     
-            get_product = prod.get_product(  schema=check_get_request.get_schema(), 
-                                             request=check_get_request.get_request(), 
-                                             db=self.get_db()
-                                          )                         
+            get_product = prod.GetProduct(  schema=check_get_request.get_schema(), 
+                                            request=check_get_request.get_request(), 
+                                            db=self.get_db()
+                                         )                         
             if get_product.execute():
                 # Response(json encode)...
                  self.set_body(get_product.get_request())
@@ -318,15 +318,15 @@ class DELETEProductFacade(CRUDFacade):
             check_del_request = prod.CheckProductDELETERequest(body=self.get_body(), db=self.get_db())
             if check_del_request.execute():
                 # Exclusão...     
-                delete_product = prod.delete_product(  schema=check_del_request.get_schema(), 
-                                                       request=check_del_request.get_request(), 
-                                                       db=self.get_db()
-                                                    )                         
+                delete_product = prod.DeleteProduct(  schema=check_del_request.get_schema(), 
+                                                      request=check_del_request.get_request(), 
+                                                      db=self.get_db()
+                                                   )                         
                 if delete_product.execute():
                     # Tratamento da exclusão(desativação) da associação produto e fabricante...
-                    delete_product_manufacturer = manu.delete_product_manufacturer(  product_id=delete_product.get_primary_key()['id'],
-                                                                                     db=self.get_db()
-                                                                                  ) 
+                    delete_product_manufacturer = manu.DeleteProductManufacturer(  product_id=delete_product.get_primary_key()['id'],
+                                                                                   db=self.get_db()
+                                                                                ) 
                     if not delete_product_manufacturer.execute():                                           
                         self.set_status_code(delete_product_manufacturer.get_error_code())
                         self.set_body(delete_product_manufacturer.get_error_message(), True) 
