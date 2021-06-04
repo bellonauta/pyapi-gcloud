@@ -2,18 +2,18 @@
 # Biblioteca de classes base para a API.
 #--------------------------------------------------------------------
 
-from typing import AbstractSet, Union
+import abc
 import json
 import psycopg2
-import psycopg2.extras
-import abc
-from abc import abstractmethod
-
 import jsonschema
-from jsonschema import validate
+import psycopg2.extras
 
-import py_api_functions as fns
+from abc import abstractmethod
+from jsonschema import validate
+from typing import AbstractSet, Union
+
 import py_api_consts as cts
+import py_api_functions as fns
 
 class ErrorHandlerClass:
     """ Classe base para outras que precisam gerenciar/registrar erros/falhas. """

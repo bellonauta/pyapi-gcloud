@@ -3,10 +3,11 @@
 #--------------------------------------------------------------------
 
 import sys
-from abc import abstractmethod
 import json
-from typing import Union
 import jsonschema
+
+from typing import Union
+from abc import abstractmethod
 from jsonschema import validate
 
 import py_api_consts as cts

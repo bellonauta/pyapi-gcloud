@@ -4,13 +4,14 @@
 #--------------------------------------------------------------------
 
 import json
-from typing import Union
 import jsonschema
+
+from typing import Union
 from jsonschema import validate
 
 import py_api_consts as cts
-import py_api_functions as fns               
 import py_api_classes as cls          
+import py_api_functions as fns               
 
 class CheckProductPUTRequest(cls.CheckRequest):
     """ Checagem do request para PUT(Inclusão de produto). """
