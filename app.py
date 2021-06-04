@@ -20,19 +20,17 @@ application = Flask(__name__)
 def api():   
     request_pars = {'httpMethod': request.method}    
     # Conversões & adaptações...
+    request_pars['body'] = ''
     if request.method == cts._GET:
-        request_pars['body'] = ''
-        if type(request.args) is dict and 'queryStringParameters' in request.args:
-            request_pars['body'] = request.args['queryStringParameters'] if type(request.args['queryStringParameters']) is str else json.dumps(request.args['queryStringParameters'])
+        if type(request.json) is dict and 'queryStringParameters' in request.json:
+            request_pars['body'] = json.dumps(request.json['queryStringParameters'])
         else:
-            request_pars['body'] = json.dumps(request.args)                        
-    else:
-        request_pars['body'] = {}
-        if type(request.json) is dict:
-            if 'body' in request.json:
-                 request_pars['body'] = request.json['body']   
-            else:
-                 request_pars['body'] = request.json
+            request_pars['body'] = json.dumps(request.values.to_dict())
+    elif type(request.json) is dict:
+        if 'body' in request.json:
+            request_pars['body'] = request.json['body']   
+        else:
+            request_pars['body'] = request.json
     #   
     response = rest.handler(request=request_pars, in_production=in_production)      
     #

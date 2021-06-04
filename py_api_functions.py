@@ -3,6 +3,7 @@
 # *------------------------------------------------------------------*
 
 import json
+from datetime import datetime
 
 def is_empty(v) -> bool:
     """Retorna True quando "v" estiver vazia(o) ou não inicializado, conforme seu tipo."""
@@ -80,3 +81,15 @@ def get_cmd_arg(args:list, argname:str, default=None):
                    break
     #           
     return ret
+
+def hoje(fmt='%d/%m/%Y'):
+    '''Retorna a data atual no formato em "fmt".'''
+    return datetime.now().strftime(fmt)
+
+def hora(fmt='%H:%M:%S'):
+    '''Retorna a hora atual no formato em "fmt".'''
+    return datetime.now().strftime(fmt)
+
+def now(format='%d/%m/%Y %H:%M:%S'):
+    '''Retorna dia e hora atuais no formato em "format".'''
+    return datetime.now().strftime(format)

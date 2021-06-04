@@ -448,14 +448,14 @@ class DBPostgres(DatabaseInterface):
 
 class CheckRequest(ErrorHandlerClass):
    
-     def __init__(self, httpMethod: str, body:Union[str,dict], db: DatabaseInterface):
+     def __init__(self, http_method: str, body:Union[str,dict], db: DatabaseInterface):
         super().__init__() 
 
         # Privates...
         self.__body = body
         self.__request = {}
         self.__db = db
-        self.__http_method = httpMethod        
+        self.__http_method = http_method        
 
      def get_http_method(self):
          return self.__http_method

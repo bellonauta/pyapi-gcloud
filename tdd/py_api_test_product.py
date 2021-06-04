@@ -1,4 +1,3 @@
-
 # coding:utf-8
 
 #--------------------------------------------------------------------
@@ -19,6 +18,7 @@ import requests
 import unittest
 
 from pathlib import Path
+from datetime import datetime
 from typing import AbstractSet, Union
 
 
@@ -39,11 +39,11 @@ class ProductAPITests(unittest.TestCase):
         body = { 
                   'httpMethod': cts._PUT,  
                   'body': {        
-                      "name": "Chapuleta da corrêia dentada",
+                      "name": fns.now(format='%Y%m%d%H%M%S')+"Chapuleta da corrêia dentada",
                       "description": "Chapa de aço que vai na chapuleta, folheada a ouro",
                       "barcode": "6466546464645",
                       "manufacturer": {  
-                                         "name": "SpaceX & NASA",
+                                         "name": fns.now(format='%Y%m%d%H%M%S')+"SpaceX & NASA",
                                       },
                       "unitPrice": 101234748.01
                   }   
@@ -63,6 +63,7 @@ class ProductAPITests(unittest.TestCase):
         self.assertNotEqual(request_error_exception, 'connecttimeout', 'Tempo esgotado para conexão com "'+api_url+'".')                  
         self.assertEqual(request_error_exception, None, 'Falha na conexão com "'+api_url+'".\n'+request_error_message)                  
         self.assertEqual(type(put), requests.models.Response, 'Retorno deve ser do tipo "Response" mas é do tipo "'+ type(put).__name__)
+        self.assertEqual(put.status_code, requests.codes.ok, 'Falha no request para "'+api_url+'".\n'+str(put.status_code)+' - '+put.reason)                  
         self.assertEqual('statusCode' in put.json().keys(), True, 'O atributo "statusCode" não foi retornado.')
         self.assertEqual(type(put.json()['statusCode']), int, 'O atributo "statusCode" deve ser do tipo "int" mas é do tipo "'+type(put.json()['statusCode']).__name__+'".')
         self.assertEqual(200, put.json()['statusCode'], put.json()['body'] if 'body' in put.json().keys() else 'Erro desconhecido.')        
@@ -91,42 +92,52 @@ class ProductAPITests(unittest.TestCase):
         # Arrange...
         body = { 
                   'httpMethod': cts._POST,  
-                  'body': json.dumps({     
+                  'body': {     
                             "id": 206,                    
-                            "name": "Correia desdentada",
+                            "name": fns.now(format='%Y%m%d%H%M%S')+"Correia desdentada",
                             "description": "Correia sem dentes, para polias 'ensopadas'.",
                             "barcode": "12379B64AC86BB",
-                            "manufacturer": { "id": 203 }, # TROCA
-                            # "manufacturer": { "name": "Sacadas & Truques LTDA" }, # INSERE
+                            "manufacturer": { "id": 201 }, # TROCA
+                            # "manufacturer": { "name": fns.now(format='%Y%m%d%H%M%S')+"Sacadas & Truques LTDA" }, # INSERE
                             "unitPrice": 20234748.03
-                          })   
+                          }   
                }   
       
         # Act...
-        post = api_prod.handler(request=body, in_production=False)          
+        request_error_exception = None
+        request_error_message = ""
+        post = None
+        try: 
+            post = requests.post(url=api_url, json=body, timeout=10, allow_redirects=True)   
+        except Exception as ex:
+            request_error_exception = type(ex).__name__.strip().lower()                                    
+            request_error_message = str(ex)     
         
-        # Asserts...        
-        self.assertEqual(type(post), dict, 'Retorno deve ser do tipo "dict" mas é do tipo "'+ type(post).__name__ +'".')
-        self.assertEqual('statusCode' in post.keys(), True, 'O atributo "statusCode" não foi retornado.')
-        self.assertEqual(type(post['statusCode']), int, 'O atributo "statusCode" deve ser do tipo "int" mas é do tipo "'+type(post['statusCode']).__name__+'".')
-        self.assertEqual(200, post['statusCode'], post['body'] if 'body' in post.keys() else 'Erro desconhecido.')        
-        self.assertEqual('body' in post.keys(), True, 'O atributo "body" não foi retornado.')
-        self.assertGreater(len(post['body']) , 0, 'O atributo "body" foi retornado vazio.')
+        # Asserts...      
+        self.assertNotEqual(request_error_exception, 'connecttimeout', 'Tempo esgotado para conexão com "'+api_url+'".')                  
+        self.assertEqual(request_error_exception, None, 'Falha na conexão com "'+api_url+'".\n'+request_error_message)                  
+        self.assertEqual(type(post), requests.models.Response, 'Retorno deve ser do tipo "Response" mas é do tipo "'+ type(post).__name__)
+        self.assertEqual(post.status_code, requests.codes.ok, 'Falha no request para "'+api_url+'".\n'+str(post.status_code)+' - '+post.reason)                  
+        self.assertEqual('statusCode' in post.json().keys(), True, 'O atributo "statusCode" não foi retornado.')
+        self.assertEqual(type(post.json()['statusCode']), int, 'O atributo "statusCode" deve ser do tipo "int" mas é do tipo "'+type(post.json()['statusCode']).__name__+'".')
+        self.assertEqual(200, post.json()['statusCode'], post.json()['body'] if 'body' in post.json().keys() else 'Erro desconhecido.')        
+        self.assertEqual('body' in post.json().keys(), True, 'O atributo "body" não foi retornado.')
+        self.assertGreater(len(post.json()['body']) , 0, 'O atributo "body" foi retornado vazio.')
         
         try:
-            post['body'] = json.loads(post['body'])       
-            jsonLoadsBody = True
+            body = json.loads(post.json()['body'])       
+            json_valid = True
         except Exception:
-            jsonLoadsBody = False
+            json_valid = False
         
-        self.assertEqual(jsonLoadsBody, True, 'O "body" não contém um json encode válido.')
+        self.assertEqual(json_valid, True, 'O "body" não contém um json encode válido.')
         
-        self.assertEqual('id' in post['body'].keys(), True, 'O atributo "id" não foi retornado.')
-        self.assertEqual(type(post['body']['id']), int, 'O atributo "id" deve ser do tipo "int" mas é do tipo "'+type(post['body']['id']).__name__+'".')
+        self.assertEqual('id' in body.keys(), True, 'O atributo "id" não foi retornado.')
+        self.assertEqual(type(body['id']), int, 'O atributo "id" deve ser do tipo "int" mas é do tipo "'+type(body['id']).__name__+'".')
         
-        self.assertEqual('manufacturer' in post['body'].keys(), True, 'O atributo "manufacturer" não foi retornado.')
-        self.assertEqual('id' in post['body']['manufacturer'].keys(), True, 'O atributo "manufacturer.id" não foi retornado.')
-        self.assertEqual(type(post['body']['manufacturer']['id']), int, 'O atributo "manufacturer.id" deve ser do tipo "int" mas é do tipo "'+type(post['body']['manufacturer']['id']).__name__+'".')   
+        self.assertEqual('manufacturer' in body.keys(), True, 'O atributo "manufacturer" não foi retornado.')
+        self.assertEqual('id' in body['manufacturer'].keys(), True, 'O atributo "manufacturer.id" não foi retornado.')
+        self.assertEqual(type(body['manufacturer']['id']), int, 'O atributo "manufacturer.id" deve ser do tipo "int" mas é do tipo "'+type(body['manufacturer']['id']).__name__+'".')        
         
         
     def test_delete_product(self):
@@ -136,31 +147,41 @@ class ProductAPITests(unittest.TestCase):
         body = { 
                   'httpMethod': cts._DEL,  
                   'body': json.dumps({     
-                            "id": 66,                   
+                            "id": 207,                   
                           })   
                }   
       
         # Act...
-        post = api_prod.handler(request=body, in_production=False)             
+        request_error_exception = None
+        request_error_message = ""
+        delete = None
+        try: 
+            delete = requests.delete(url=api_url, json=body, timeout=10, allow_redirects=True)   
+        except Exception as ex:
+            request_error_exception = type(ex).__name__.strip().lower()                                    
+            request_error_message = str(ex)     
         
-        # Asserts...        
-        self.assertEqual(type(post), dict, 'Retorno deve ser do tipo "dict" mas é do tipo "'+ type(post).__name__ +'".')
-        self.assertEqual('statusCode' in post.keys(), True, 'O atributo "statusCode" não foi retornado.')
-        self.assertEqual(type(post['statusCode']), int, 'O atributo "statusCode" deve ser do tipo "int" mas é do tipo "'+type(post['statusCode']).__name__+'".')
-        self.assertEqual(200, post['statusCode'], post['body'] if 'body' in post.keys() else 'Erro desconhecido.')        
-        self.assertEqual('body' in post.keys(), True, 'O atributo "body" não foi retornado.')
-        self.assertGreater(len(post['body']) , 0, 'O atributo "body" foi retornado vazio.')
+        # Asserts...      
+        self.assertNotEqual(request_error_exception, 'connecttimeout', 'Tempo esgotado para conexão com "'+api_url+'".')                  
+        self.assertEqual(request_error_exception, None, 'Falha na conexão com "'+api_url+'".\n'+request_error_message)                  
+        self.assertEqual(type(delete), requests.models.Response, 'Retorno deve ser do tipo "Response" mas é do tipo "'+ type(delete).__name__)
+        self.assertEqual(delete.status_code, requests.codes.ok, 'Falha no request para "'+api_url+'".\n'+str(delete.status_code)+' - '+delete.reason)                  
+        self.assertEqual('statusCode' in delete.json().keys(), True, 'O atributo "statusCode" não foi retornado.')
+        self.assertEqual(type(delete.json()['statusCode']), int, 'O atributo "statusCode" deve ser do tipo "int" mas é do tipo "'+type(delete.json()['statusCode']).__name__+'".')
+        self.assertEqual(200, delete.json()['statusCode'], delete.json()['body'] if 'body' in delete.json().keys() else 'Erro desconhecido.')        
+        self.assertEqual('body' in delete.json().keys(), True, 'O atributo "body" não foi retornado.')
+        self.assertGreater(len(delete.json()['body']) , 0, 'O atributo "body" foi retornado vazio.')
         
         try:
-            post['body'] = json.loads(post['body'])       
-            jsonLoadsBody = True
+            body = json.loads(delete.json()['body'])       
+            json_valid = True
         except Exception:
-            jsonLoadsBody = False
+            json_valid = False
         
-        self.assertEqual(jsonLoadsBody, True, 'O "body" não contém um json encode válido.')
+        self.assertEqual(json_valid, True, 'O "body" não contém um json encode válido.')
         
-        self.assertEqual('id' in post['body'].keys(), True, 'O atributo "id" não foi retornado.')
-        self.assertEqual(type(post['body']['id']), int, 'O atributo "id" deve ser do tipo "int" mas é do tipo "'+type(post['body']['id']).__name__+'".')
+        self.assertEqual('id' in body.keys(), True, 'O atributo "id" não foi retornado.')
+        self.assertEqual(type(body['id']), int, 'O atributo "id" deve ser do tipo "int" mas é do tipo "'+type(body['id']).__name__+'".')
         
     def test_get_product(self):
         """ Teste de consulta de produto. """     
@@ -168,42 +189,54 @@ class ProductAPITests(unittest.TestCase):
         # Arrange...
         body = { 
                   'httpMethod': cts._GET,  
-                  'queryStringParameters': json.dumps({     
-                            "id": '42',      #  0=Listagem  >0=Detalhes de um produto
-                            "page": '2', 
+                  'queryStringParameters': {     
+                            "id": '207',      #  0=Listagem  >0=Detalhes de um produto
+                            "page": '0', 
                             "order": "name"        
-                  })   
+                  }   
                }   
       
         # Act...
-        get = api_prod.handler(request=body, in_production=False)    
-        
+        request_error_exception = None
+        request_error_message = ""
+        get = None
+        try: 
+            get = requests.get(url=api_url, json=body, timeout=10, allow_redirects=True)   
+        except Exception as ex:
+            request_error_exception = type(ex).__name__.strip().lower()                                    
+            request_error_message = str(ex)     
+              
         # Asserts...        
-        self.assertEqual(type(get), dict, 'Retorno deve ser do tipo "dict" mas é do tipo "'+ type(get).__name__ +'".')
-        self.assertEqual('statusCode' in get.keys(), True, 'O atributo "statusCode" não foi retornado.')
-        self.assertEqual(type(get['statusCode']), int, 'O atributo "statusCode" deve ser do tipo "int" mas é do tipo "'+type(get['statusCode']).__name__+'".')
-        self.assertEqual(200, get['statusCode'], get['body'] if 'body' in get.keys() else 'Erro desconhecido.')        
-        self.assertEqual('body' in get.keys(), True, 'O atributo "body" não foi retornado.')
-        self.assertGreater(len(get['body']) , 0, 'O atributo "body" foi retornado vazio.')
+        self.assertNotEqual(request_error_exception, 'connecttimeout', 'Tempo esgotado para conexão com "'+api_url+'".')                  
+        self.assertEqual(request_error_exception, None, 'Falha na conexão com "'+api_url+'".\n'+request_error_message)                  
+        self.assertEqual(type(get), requests.models.Response, 'Retorno deve ser do tipo "Response" mas é do tipo "'+ type(get).__name__)
+        self.assertEqual(get.status_code, requests.codes.ok, 'Falha no request para "'+api_url+'".\n'+str(get.status_code)+' - '+get.reason)                  
+        self.assertEqual('statusCode' in get.json().keys(), True, 'O atributo "statusCode" não foi retornado.')
+        self.assertEqual(type(get.json()['statusCode']), int, 'O atributo "statusCode" deve ser do tipo "int" mas é do tipo "'+type(get.json()['statusCode']).__name__+'".')
+        self.assertEqual(200, get.json()['statusCode'], get.json()['body'] if 'body' in get.json().keys() else 'Erro desconhecido.')        
+        self.assertEqual('body' in get.json().keys(), True, 'O atributo "body" não foi retornado.')
+        self.assertGreater(len(get.json()['body']) , 0, 'O atributo "body" foi retornado vazio.')
         
         try:
-            get['body'] = json.loads(get['body'])       
-            jsonLoadsBody = True
+            body = json.loads(get.json()['body'])       
+            json_valid = True
         except Exception:
-            jsonLoadsBody = False
+            json_valid = False
         
-        self.assertEqual(jsonLoadsBody, True, 'O "body" não contém um json encode válido.')    
+        self.assertEqual(json_valid, True, 'O "body" não contém um json encode válido.')    
         
-        self.assertEqual('maxRowsPerPage' in get['body'].keys(), True, 'O atributo "maxRowsPerPage" não foi retornado.')
-        self.assertEqual('rows' in get['body'].keys(), True, 'O atributo "rows" não foi retornado.')
-        self.assertLessEqual(len(get['body']['rows']), get['body']['maxRowsPerPage'], 'Mais registros que o permitido sendo retornados')
+        self.assertEqual('maxRowsPerPage' in body.keys(), True, 'O atributo "maxRowsPerPage" não foi retornado.')
+        self.assertEqual('rows' in body.keys(), True, 'O atributo "rows" não foi retornado.')
+        self.assertLessEqual(len(body['rows']), body['maxRowsPerPage'], 'Mais registros que o permitido sendo retornados')
         
 # ----------------------------------------------------------------------------------------------------------------------            
 
 def test_suite():
     suite = unittest.TestSuite()
-    suite.addTest(ProductAPITests('test_insert_product_with_new_manufacturer'))
-    # suite.addTest(ProductAPITests('test_update_product_and_change_manufacturer'))
+    #suite.addTest(ProductAPITests('test_insert_product_with_new_manufacturer'))
+    #suite.addTest(ProductAPITests('test_update_product_and_change_manufacturer'))
+    #suite.addTest(ProductAPITests('test_delete_product'))
+    suite.addTest(ProductAPITests('test_get_product'))
     return suite
 # ----------------------------------------------------------------------------------------------------------------------            
   
