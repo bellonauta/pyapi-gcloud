@@ -37,12 +37,12 @@ ser "dockado" no Google Cloud Run.
 ## Testes
 ### Do container
 Abrir o projeto no container e executar no terminal:\
-<font color='grey'>$ python3 app.py</font>
+<font color='grey'>$ python3 api.py</font>
 
 ### Unitários
 Os testes unitários foram implementados com o framework unittest, e estão no script "tdd/py_api_test_product.py".\
 Execute no terminal:\
-<font color='grey'>$ python3 -m unittest tdd/py_api_test_product.py</font>
+<font color='grey'>$ python3 tdd/py_api_test_product.py --url:http://dominio_de_teste:PORTA</font>
 
 ### Da API
 Os testes de chamadas remotas para a API, podem ser feitos pelo https://www.postman.com/ ou pela biblioteca CURL ou qualquer outra aplicação/biblioteca.
