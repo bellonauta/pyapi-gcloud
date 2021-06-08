@@ -1,7 +1,7 @@
-# PyApi - API REST de Pedidos de Venda em Python
+# PyApi - API REST de Pedidos de Venda em Python 
 
-É uma aplicação exclusivamente de nível backend, intermediário, que
-se propõe apresentar uma implementação de API REST em Python.
+É uma aplicação exclusivamente de nível backend que se propõe
+apresentar uma implementação, conteinerizada com docker, de uma API REST em Python.
 
 Está baseada no atendimento ao processo de pedidos de vendas.
 Permitirá em seu último release:
@@ -12,22 +12,53 @@ Permitirá em seu último release:
 
 Nesse primeiro release, estão implementados somente os CRUDs para produtos e fabricantes.
 
+# VSCode - Docker Desktop - WSL2 - Google Cloud Run
+Toda a implementação foi realizada no VSCode e o conteiner gerado está configurado para
+ser "dockado" no Google Cloud Run.
+
 ---
 ## Dependências
-- Python 3.8
-    - typing (AbstractSet e Union)
+- Python >= 3.7
+    - typing (+AbstractSet e Union)
     - json
-    - jsonschema (validate)
-    - psycopg2 (extras)
-    - abc (abstractmethod)
+    - jsonschema (+validate)
+    - psycopg2 (+extras)
+    - abc (+abstractmethod)
     - unittest
 
-- Cloud
-    - AWS - API Gateway, Lambda e RDS(PostgreSQL)
+- PostgreSQL >= 9.6    
+
+- VSCode
+- WSL2 (Desenvolvido no distro Debian)
+- Docker & Docker Desktop(Windows)
+- Google cloud run
+
+---
+## Testes
+### Do container
+Abrir o projeto no container e executar no terminal:\
+<font color='grey'>$ python3 api.py</font>
+
+### Unitários
+Os testes unitários foram implementados com o framework unittest, e estão no script "tdd/py_api_test_product.py".\
+Execute no terminal:\
+<font color='grey'>$ python3 tdd/py_api_test_product.py --url:http://dominio_de_teste:PORTA</font>
+
+### Da API
+Os testes de chamadas remotas para a API, podem ser feitos pelo https://www.postman.com/ ou pela biblioteca CURL ou qualquer outra aplicação/biblioteca.
+
+---
+## Deploy
+A API foi desenvolvida para dockagem no Google Cloud Run, com a
+extensão "Cloud Code" do VSCode.
+
+Antes do deploy, verifique:
+
+- Se a configuração de acesso ao banco PostgreSQL está corretamente definida no script "db/pg_conn.py". Esse script deve ser criado através da cópia do script de exemplo "db/pg_conn_sample.py";
+- Se a porta do entrypoint está corretamente configurada no Dockerfile de deploy(na pasta raiz do projeto), no "CMD", conforme sua configuração no Google Cloud Run. O padrão é a resposta da API na porta tcp 8080.
 
 ---
 ## CRUDs de produtos e fabricantes
-- API: https://3khfi4cf71.execute-api.sa-east-1.amazonaws.com/prod/product
 
 - **PUT** - Inclusão de produtos
     - Solicitação tipo 1 - Com associação de fabricante já cadastrado ao produto:
@@ -247,6 +278,7 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
                </pre>          
 ---
 ## Tabelas
+Se desejar a criação automática das tabelas, restaure o arquivo "db/pg_db.backup" sobre o banco que você criou.
 - Produtos:
   <pre>
   CREATE TABLE schema_name.product
@@ -323,12 +355,6 @@ Cabe ressaltar que um produto ou fabricante nunca é excluído, mas somente marc
       CONSTRAINT orderproduct_pkey PRIMARY KEY (order_id, product_id)
   )
   </pre>   
-
----
-## Testes
-Os testes unitários foram implementados com o framework unittest, e estão no script "tdd/py_api_test_product.py".
-
-Os testes remotos da API, podem ser feitos pelo https://www.postman.com/ ou pela biblioteca curl ou qualquer outra aplicação/biblioteca.
 
 ---
 ## ToDo

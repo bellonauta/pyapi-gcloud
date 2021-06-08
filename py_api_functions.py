@@ -1,8 +1,9 @@
 # *------------------------------------------------------------------*
-# *  Biblioteca de funções base para o desafio TOTVS.                *  
+# *  Biblioteca de funções base para a API.                          *  
 # *------------------------------------------------------------------*
 
 import json
+from datetime import datetime
 
 def is_empty(v) -> bool:
     """Retorna True quando "v" estiver vazia(o) ou não inicializado, conforme seu tipo."""
@@ -54,7 +55,41 @@ def to_str(val,def_val:str='') -> str:
         else:        
             try:           
                 ret = str(val)  
-            except Exception as error:        
+            except Exception:        
                 ret = def_val
     #         
     return (ret if len(ret) > 0 and (not type(ret) is str or ret.strip() != '') else def_val)     
+
+def get_cmd_arg(args:list, argname:str, default=None):   
+    """
+    Retorna o valor de um argumento/parâmetro contido na lista passada para o script.            
+    Args:
+        args (list): Argumentos recebidos pelo script(sys.argv).
+        argname (str): Nome do argumento a retornar.
+        default (any, optional): Valor a retornar quando argumento não encontrado no array. Defaults to None.
+    Returns:
+        mixed: Valor do argumento ou, se argumento não encontrado, o valor em default
+    """       
+    ret = default
+    argname = argname.strip()
+    if type(args) is list and len(args) > 0 and argname != '':
+        for arg in args:
+           if type(arg) is str: 
+               arg = arg.strip()         
+               if arg != '' and arg[0:len(argname)+1] == argname+'=':     
+                   ret = arg[len(argname)+1:].strip()
+                   break
+    #           
+    return ret
+
+def hoje(fmt='%d/%m/%Y'):
+    '''Retorna a data atual no formato em "fmt".'''
+    return datetime.now().strftime(fmt)
+
+def hora(fmt='%H:%M:%S'):
+    '''Retorna a hora atual no formato em "fmt".'''
+    return datetime.now().strftime(fmt)
+
+def now(format='%d/%m/%Y %H:%M:%S'):
+    '''Retorna dia e hora atuais no formato em "format".'''
+    return datetime.now().strftime(format)

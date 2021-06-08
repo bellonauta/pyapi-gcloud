@@ -3,7 +3,8 @@ log.log
 **/.vscode/.ropeproject/**
 .vscode
 __pycache__
-aws
+db/pg_conn.py
+pg_conn.py
 **/.vscode-test/**
 **/.vscode test/**
 **/.vscode-smoke/**
@@ -12,3 +13,4 @@ aws
 tmp/**
 .python-version
 .vs/
+

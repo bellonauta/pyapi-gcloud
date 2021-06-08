@@ -1,19 +1,19 @@
 #--------------------------------------------------------------------
-# Biblioteca de classes base para o desafio TOTVS.
+# Biblioteca de classes base para a API.
 #--------------------------------------------------------------------
 
-from typing import AbstractSet, Union
+import abc
 import json
 import psycopg2
-import psycopg2.extras
-import abc
-from abc import abstractmethod
-
 import jsonschema
-from jsonschema import validate
+import psycopg2.extras
 
-import py_api_functions as fns
+from abc import abstractmethod
+from jsonschema import validate
+from typing import AbstractSet, Union
+
 import py_api_consts as cts
+import py_api_functions as fns
 
 class ErrorHandlerClass:
     """ Classe base para outras que precisam gerenciar/registrar erros/falhas. """
@@ -37,7 +37,13 @@ class ErrorHandlerClass:
         return self.__error_message
     
     def get_error_code(self):       
-        return self.__error_code                 
+        return self.__error_code   
+
+    def no_errors(self):    
+        """Elimina o erro registrado."""
+        self.__error = False
+        self.__error_message = ''
+        self.__error_code = 0                      
 #---------------------------------------------------------------------------------      
 
 
@@ -90,6 +96,14 @@ class DatabaseInterface(ErrorHandlerClass):
     
     @abstractmethod
     def query(self, sql:str, pars:Union[dict,list], commit:False):
+        pass
+    
+    @abstractmethod
+    def fetch(self, clause:str, cursor) -> bool:
+        """
+        Busca o retorno da query executada e popula na propriedade __rows.
+        Retorna bool True/False: Quanto ao sucesso na execução.        
+        """     
         pass
     
     @abstractmethod
@@ -151,8 +165,7 @@ class DBPostgres(DatabaseInterface):
         self.__connection = None
         self.__in_transaction = False
         
-        self.__key_not_found = False
-       
+        self.__key_not_found = False                                           
         
     def readable_exception(self, exception_err):
         """
@@ -226,6 +239,7 @@ class DBPostgres(DatabaseInterface):
                 self.__connection = None 
                 
     def start_transaction(self) -> bool:
+        self.no_errors()
         self.__in_transaction = self.is_connected()
         return self.__in_transaction
     
@@ -233,6 +247,7 @@ class DBPostgres(DatabaseInterface):
         return self.__in_transaction
     
     def commit(self) -> bool:
+        self.no_errors()
         if self.__in_transaction:
             try:
                 self.__connection.commit();          
@@ -244,6 +259,7 @@ class DBPostgres(DatabaseInterface):
         return not self.get_error()
     
     def rollback(self) -> bool:
+        self.no_errors()
         if self.__in_transaction:
             try:
                 self.__connection.rollback();          
@@ -253,6 +269,30 @@ class DBPostgres(DatabaseInterface):
         self.__in_transaction = False    
         #
         return not self.get_error()
+    
+    def fetch(self, clause:str, cursor) -> bool:
+        """
+        Busca o retorno da query executada e popula na propriedade __rows.
+        Retorna bool True/False: Quanto ao sucesso na execução.
+        """        
+        self.__rows = []     
+        try: 
+            if clause == 'select':
+                if type(cursor) is psycopg2.extras.DictCursor and cursor.rowcount > 0:
+                    self.__rows = cursor.fetchall()
+            elif clause == 'insert' and type(cursor) is psycopg2.extras.DictCursor:
+                # O INSERT pode retornar valores, por exemplo, quando
+                # insere um novo registro e retorna a PK... 
+                # Tenta ler(safe-mode) o retorno da query...
+                try: 
+                    self.__rows = cursor.fetchone() 
+                except Exception as error:
+                    self.__rows = []   
+        except psycopg2.Error as error:
+            self.set_error(msg='Falha no fetch da query. [{}]'.format(self.readable_exception(error)))        
+        #                 
+        return not self.get_error()        
+        
     
     def query(self, sql:str, pars:Union[dict,list], commit:False):
         """
@@ -264,6 +304,7 @@ class DBPostgres(DatabaseInterface):
           bool commit: Passe True quando o commit deva ser executado após a execução da query.
         Retorna bool True/False: Quanto ao sucesso na execução.
         """
+        self.no_errors()
         self.__rows = []        
         #
         if self.is_connected():
@@ -271,23 +312,14 @@ class DBPostgres(DatabaseInterface):
             try:
                 sql_clause = sql[:6].strip().lower()
                 cursor.execute(sql, pars)
-                if sql_clause == 'select':
-                    if type(cursor) is psycopg2.extras.DictCursor and cursor.rowcount > 0:
-                        self.__rows = cursor.fetchall()
-                elif sql_clause == 'insert':
-                    # O INSERT pode retornar valores, por exemplo, quando
-                    # insere um novo registro e retorna a PK... 
-                    if type(cursor) is psycopg2.extras.DictCursor:
-                        # Tenta ler(safe-mode) o retorno da query...
-                        try: 
-                            self.__rows = cursor.fetchone() 
-                        except Exception as error:
-                            self.__rows = []            
+                self.fetch(clause=sql_clause, cursor=cursor)
                 #   
-                if commit or (not self.__in_transaction and sql_clause == 'select'): self.commit()
+                if commit or (not self.__in_transaction and sql_clause == 'select'):
+                    # Auto-commit...
+                    self.commit()
             except psycopg2.Error as error:
                 self.set_error(msg='Falha em execução de query. [{}]'.format(self.readable_exception(error)))
-            finally:   
+            finally:                      
                 if cursor:
                     cursor.close()
                     del cursor
@@ -416,14 +448,14 @@ class DBPostgres(DatabaseInterface):
 
 class CheckRequest(ErrorHandlerClass):
    
-     def __init__(self, httpMethod: str, body:Union[str,dict], db: DatabaseInterface):
+     def __init__(self, http_method: str, body:Union[str,dict], db: DatabaseInterface):
         super().__init__() 
 
         # Privates...
         self.__body = body
         self.__request = {}
         self.__db = db
-        self.__http_method = httpMethod        
+        self.__http_method = http_method        
 
      def get_http_method(self):
          return self.__http_method
@@ -462,22 +494,21 @@ class CheckRequest(ErrorHandlerClass):
              self.set_error('A conexão com o banco não foi estabelecida.')
          elif fns.is_empty(self.__body):
              self.set_error('O body/query da requisição está vazio(a).')    
-         else:
-             if type(self.__body) is dict:
-                 self.__request = self.__body   
-             else:    
-                 # JSON decode do body do request...
-                 try:                 
-                     self.__request = json.loads(self.__body)                             
-                 except Exception as err:
-                     self.set_error('Falha em json decode. [{}]'.format(str(err)))
-             #                    
-             # Validação do schema...
-             if not self.get_error():
-                if len(self.__request.keys()) == 0:
-                    self.set_error('Requisição vazia.')
-                else:     
-                    self.check()                   
+         elif type(self.__body) is dict:
+             self.__request = self.__body   
+         else:    
+             # JSON decode do body do request...
+             try:                 
+                 self.__request = json.loads(self.__body)                             
+             except Exception as err:
+                 self.set_error('Falha em json decode. [{}]'.format(str(err)))
+         #                    
+         # Validação do schema...
+         if not self.get_error():
+            if len(self.__request.keys()) == 0:
+                self.set_error('Requisição vazia.')
+            else:     
+                self.check()                   
          #
          return not self.get_error()   
  

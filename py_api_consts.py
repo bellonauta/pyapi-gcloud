@@ -1,20 +1,8 @@
 #--------------------------------------------------------------------
-# Biblioteca de constantes base para o desafio TOTVS.
+# Biblioteca de constantes base para a API.
 #--------------------------------------------------------------------
 
 import json
-
-# Ambiente...
-_IN_PRODUCTION = False
-
-# Constantes de conexão com o banco de dados...
-_PG_CONNECTION = {
-    'host': 'totvs.cvxv5cunrlzo.sa-east-1.rds.amazonaws.com',
-    'port': 5432,
-    'name': 'totvs',
-    'user': 'belonauta',
-     'pwd': '03*1966pg'
-}
 
 # Constantes de estado/situação/atividade...
 _YES = 'y'
@@ -26,9 +14,6 @@ _PUT = 'PUT'
 _POST = 'POST'
 _DEL = 'DELETE'
 _HTTP_METHODS = [_GET, _PUT, _POST, _DEL]
-
-# URL das APIs...
-_API_PRODUCT = 'https://3khfi4cf71.execute-api.sa-east-1.amazonaws.com/prod/product'
 
 # Constantes para queries...
 _QRY_PAGE_ROWS_LIMIT = 50
@@ -105,3 +90,14 @@ _GET_MANUFACTURER_JSON_SCHEMA = {
        },
        "required": []         
 }   
+
+#---------------------------------------------------------------------------------
+
+# Dict padrão para retorno da API...
+_API_RESPONSE = {
+                   'statusCode': 200, 
+                   'headers': {
+                                 'Content-Type': 'application/json'
+                              },
+                   'body': ''                 
+                }

@@ -4,19 +4,20 @@
 #--------------------------------------------------------------------
 
 import json
-from typing import Union
 import jsonschema
+
+from typing import Union
 from jsonschema import validate
 
 import py_api_consts as cts
-import py_api_functions as fns               
 import py_api_classes as cls          
+import py_api_functions as fns               
 
 class CheckProductPUTRequest(cls.CheckRequest):
     """ Checagem do request para PUT(Inclusão de produto). """
     
     def __init__(self, body:Union[str,dict], db:cls.DatabaseInterface):
-        super().__init__(httpMethod=cts._PUT, body=body, db=db) 
+        super().__init__(http_method=cts._PUT, body=body, db=db) 
         
         # Importa o schema json de validação do request...
         self.__schema = cts._INSERT_PRODUCT_JSON_SCHEMA         
@@ -38,7 +39,7 @@ class CheckProductPOSTRequest(cls.CheckRequest):
     """ Checagem do request para POST(Alteração de produto). """
     
     def __init__(self, body:Union[str,dict], db:cls.DatabaseInterface):
-        super().__init__(httpMethod=cts._POST, body=body, db=db) 
+        super().__init__(http_method=cts._POST, body=body, db=db) 
         
         # Importa o schema json de validação do request...
         self.__schema = cts._UPDATE_PRODUCT_JSON_SCHEMA         
@@ -63,7 +64,7 @@ class CheckProductDELETERequest(cls.CheckRequest):
     """    
     
     def __init__(self, body:Union[str,dict], db:cls.DatabaseInterface):
-        super().__init__(httpMethod=cts._DEL, body=body, db=db) 
+        super().__init__(http_method=cts._DEL, body=body, db=db) 
         
         # Importa o schema json de validação do request...
         self.__schema = cts._DELETE_PRODUCT_JSON_SCHEMA         
@@ -86,7 +87,7 @@ class CheckProductGETRequest(cls.CheckRequest):
     """    
     
     def __init__(self, body:Union[str,dict], db:cls.DatabaseInterface):
-        super().__init__(httpMethod=cts._GET, body=body, db=db) 
+        super().__init__(http_method=cts._GET, body=body, db=db) 
         
         # Importa o schema json de validação do request...
         self.__schema = cts._GET_PRODUCT_JSON_SCHEMA         
